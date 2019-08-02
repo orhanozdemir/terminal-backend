@@ -9,7 +9,7 @@ import java.util.Date;
 @Table(name = "Capacity", schema = "test", catalog = "PRS_SEVK")
 public class Capacity {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne

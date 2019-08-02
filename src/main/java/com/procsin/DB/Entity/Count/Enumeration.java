@@ -14,7 +14,7 @@ public class Enumeration {
         ACTIVE, FINISHED, CANCELLED
     }
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne

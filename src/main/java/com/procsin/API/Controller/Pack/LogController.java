@@ -4,7 +4,6 @@ import com.procsin.API.Model.LeadershipResponseEntity;
 import com.procsin.API.Model.StatsResponseModel;
 import com.procsin.API.Service.Interface.Pack.LogService;
 import com.procsin.DB.Entity.Pack.OrderLog;
-import com.procsin.DB.Entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

@@ -6,11 +6,11 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "LoginLog", schema = "test", catalog = "PRS_SEVK")
+@Table(name = "LoginLog", schema = "sevk", catalog = "PRS_SEVK")
 public class LoginLog {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @ManyToOne

@@ -1,16 +1,14 @@
 package com.procsin.DB.Entity.Pack;
 
 import com.procsin.API.Model.TSOFT.OrderResponseModel;
-
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "Orders", schema = "test", catalog = "PRS_SEVK")
+@Table(name = "Orders", schema = "sevk", catalog = "PRS_SEVK")
 public class Orders {
 
-    @Id
-    @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(unique = true)

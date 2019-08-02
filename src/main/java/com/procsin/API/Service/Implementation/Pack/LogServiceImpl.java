@@ -81,21 +81,21 @@ public class LogServiceImpl implements LogService {
     public List<LeadershipResponseEntity> getLeadership(String type) {
         List<LeadershipResponseEntity> responseModel = new ArrayList<LeadershipResponseEntity>();
         if (type.equals(LeadershipResponseEntity.LeaderShipType.DAILY.toString())) {
-            return em.createNativeQuery(Queries.LEADERSHIP_DAILY_QUERY).getResultList();
+            return em.createNativeQuery(Queries.LEADERSHIP_DAILY_QUERY, LeadershipResponseEntity.class).getResultList();
         }
         else if (type.equals(LeadershipResponseEntity.LeaderShipType.MONTHLY.toString())) {
-            return em.createNativeQuery(Queries.LEADERSHIP_MONTHLY_QUERY).getResultList();
+            return em.createNativeQuery(Queries.LEADERSHIP_MONTHLY_QUERY, LeadershipResponseEntity.class).getResultList();
         }
         else if (type.equals(LeadershipResponseEntity.LeaderShipType.ALL.toString())){
-            return em.createNativeQuery(Queries.LEADERSHIP_ALL_QUERY).getResultList();
+            return em.createNativeQuery(Queries.LEADERSHIP_ALL_QUERY, LeadershipResponseEntity.class).getResultList();
         }
         return responseModel;
     }
 
     @Override
     public StatsResponseModel getMyStats() {
-        MyLogsResponseEntity allStats = (MyLogsResponseEntity) em.createNativeQuery(Queries.STATS_MY_ALL_STATS).setParameter("userId",getActiveUser().getId()).getSingleResult();
-        MyLogsResponseEntity todayStats = (MyLogsResponseEntity) em.createNativeQuery(Queries.STATS_MY_DAILY_STATS).setParameter("userId",getActiveUser().getId()).getSingleResult();
+        MyLogsResponseEntity allStats = (MyLogsResponseEntity) em.createNativeQuery(Queries.STATS_MY_ALL_STATS, MyLogsResponseEntity.class).setParameter("userId",getActiveUser().getId()).getSingleResult();
+        MyLogsResponseEntity todayStats = (MyLogsResponseEntity) em.createNativeQuery(Queries.STATS_MY_DAILY_STATS, MyLogsResponseEntity.class).setParameter("userId",getActiveUser().getId()).getSingleResult();
         return new StatsResponseModel(todayStats.totalOrderCount,allStats.totalOrderCount,todayStats.totalProductCount,allStats.totalProductCount,todayStats.totalCost,allStats.totalCost);
     }
 

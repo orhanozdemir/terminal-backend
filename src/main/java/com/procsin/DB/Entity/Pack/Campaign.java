@@ -4,11 +4,11 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "Campaign", schema = "test", catalog = "PRS_SEVK")
+@Table(name = "Campaign", schema = "sevk", catalog = "PRS_SEVK")
 public class Campaign {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)

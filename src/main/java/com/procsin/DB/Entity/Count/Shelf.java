@@ -14,7 +14,7 @@ public class Shelf {
         RAF, STAND, DEPO
     }
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne

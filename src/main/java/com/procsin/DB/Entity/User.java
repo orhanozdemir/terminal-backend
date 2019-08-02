@@ -7,7 +7,7 @@ import java.util.Set;
 @Table(name = "Account", schema = "test", catalog = "PRS_SEVK")
 public class User {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(unique = true)

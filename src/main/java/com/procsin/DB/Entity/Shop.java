@@ -6,7 +6,7 @@ import javax.persistence.*;
 @Table(name = "Shop", schema = "test", catalog = "PRS_SEVK")
 public class Shop {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true, nullable = false)
