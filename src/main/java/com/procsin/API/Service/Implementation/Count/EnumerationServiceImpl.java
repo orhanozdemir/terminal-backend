@@ -34,7 +34,7 @@ public class EnumerationServiceImpl implements EnumerationService {
     public Enumeration finish(Long userId, Long enumerationId) {
         User user = userRepository.findById(userId).get();
         Enumeration enumeration = enumerationRepository.findById(enumerationId).get();
-        enumeration.setStatus(Enumeration.EnumStatus.FINISHED.toString());
+        enumeration.setStatus(Enumeration.EnumStatus.FINISHED);
         enumeration.setUpdatedBy(user);
         enumeration.setUpdatedAt(new Date());
         enumerationRepository.save(enumeration);
@@ -44,7 +44,7 @@ public class EnumerationServiceImpl implements EnumerationService {
     public Enumeration cancel(Long userId, Long enumerationId) {
         User user = userRepository.findById(userId).get();
         Enumeration enumeration = enumerationRepository.findById(enumerationId).get();
-        enumeration.setStatus(Enumeration.EnumStatus.CANCELLED.toString());
+        enumeration.setStatus(Enumeration.EnumStatus.CANCELLED);
         enumeration.setUpdatedBy(user);
         enumeration.setUpdatedAt(new Date());
         return enumerationRepository.save(enumeration);

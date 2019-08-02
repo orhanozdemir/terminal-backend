@@ -37,7 +37,7 @@ public class ShelfServiceImpl implements ShelfService {
                 shelf.setShop(shop);
                 shelf.setSection(i);
                 shelf.setRow(k);
-                shelf.setType(model.type);
+                shelf.setType(Shelf.ShelfType.valueOf(model.type));
                 shelf.setActive(true);
                 shelf.setCreatedBy(user);
                 shelf.setCreatedAt(new Date());
@@ -67,7 +67,7 @@ public class ShelfServiceImpl implements ShelfService {
 
     public String generateShelfBarcode(Shelf shelf) {
         String shopPart = String.format("%03d", shelf.getShop().getId());
-        String typePart = String.format("%01d", getTypeCode(Shelf.ShelfType.valueOf(shelf.getType())));
+        String typePart = String.format("%01d", getTypeCode(shelf.getType()));
         String sectionPart = String.format("%02d", shelf.getSection());
         String rowPart = String.format("%02d", shelf.getRow());
         return shopPart + typePart + sectionPart + rowPart;

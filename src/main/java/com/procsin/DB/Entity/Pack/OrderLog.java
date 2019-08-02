@@ -36,7 +36,7 @@ public class OrderLog {
     @ManyToOne
     private Orders order;
 
-    private String status;
+    private OrderStatus status;
 
     @ManyToOne
     private User user;
@@ -45,7 +45,7 @@ public class OrderLog {
 
     public OrderLog() {}
 
-    public OrderLog(Orders order, String status, User user) {
+    public OrderLog(Orders order, OrderStatus status, User user) {
         this.order = order;
         this.status = status;
         this.user = user;
@@ -68,11 +68,11 @@ public class OrderLog {
         this.order = order;
     }
 
-    public String getStatus() {
+    public OrderStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(OrderStatus status) {
         this.status = status;
     }
 

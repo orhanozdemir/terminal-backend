@@ -25,7 +25,7 @@ public class Enumeration {
 //    @JoinTable(name="enumeration_shelf", schema = "sevk", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="enumeration_id"), inverseJoinColumns=@JoinColumn(name="shelf_id"))
 //    private List<Shelf> shelves;
 
-    private String status;
+    private EnumStatus status;
     private String barcode;
 
     private Date createdAt;
@@ -41,7 +41,7 @@ public class Enumeration {
 
     public Enumeration() {}
 
-    public Enumeration(Shop shop, String status, String barcode, Date createdAt, Date updatedAt, User createdBy, User updatedBy) {
+    public Enumeration(Shop shop, EnumStatus status, String barcode, Date createdAt, Date updatedAt, User createdBy, User updatedBy) {
         this.shop = shop;
         this.status = status;
         this.barcode = barcode;
@@ -76,11 +76,11 @@ public class Enumeration {
 //    }
 
 
-    public String getStatus() {
+    public EnumStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(EnumStatus status) {
         this.status = status;
     }
 

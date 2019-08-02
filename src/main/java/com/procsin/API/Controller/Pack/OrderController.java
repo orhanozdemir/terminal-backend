@@ -2,6 +2,7 @@ package com.procsin.API.Controller.Pack;
 
 import com.procsin.API.Model.GenericResponse;
 import com.procsin.API.Model.OrderLogSuccessModel;
+import com.procsin.API.Model.TSOFT.OrderResponseModel;
 import com.procsin.API.Model.UpdateOrderRequestModel;
 import com.procsin.API.Service.Interface.Pack.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,23 +40,23 @@ public class OrderController {
 //    }
 
     @RequestMapping(value = "/prepareOrder", method = RequestMethod.POST)
-    OrderLogSuccessModel prepareOrder(@RequestBody UpdateOrderRequestModel requestModel) {
-        return orderService.prepareOrder(requestModel.user, requestModel.orderModel);
+    OrderLogSuccessModel prepareOrder(@RequestBody OrderResponseModel orderModel) {
+        return orderService.prepareOrder(orderModel);
     }
 
     @RequestMapping(value = "/updateToSupplement", method = RequestMethod.POST)
-    GenericResponse updateToSupplement(@RequestBody UpdateOrderRequestModel requestModel) {
-        return orderService.updateToSupplement(requestModel.user, requestModel.orderModel);
+    GenericResponse updateToSupplement(@RequestBody OrderResponseModel orderModel) {
+        return orderService.updateToSupplement(orderModel);
     }
 
     @RequestMapping(value = "/updateToPackCancel", method = RequestMethod.POST)
-    GenericResponse updateToPackCancel(@RequestBody UpdateOrderRequestModel requestModel) {
-        return orderService.updateToPackCancel(requestModel.user, requestModel.orderModel.OrderCode);
+    GenericResponse updateToPackCancel(@RequestBody OrderResponseModel orderModel) {
+        return orderService.updateToPackCancel(orderModel.OrderCode);
     }
 
     @RequestMapping(value = "/finishOrder", method = RequestMethod.POST)
-    GenericResponse finishOrder(@RequestBody UpdateOrderRequestModel requestModel) {
-        return orderService.finishOrder(requestModel.user, requestModel.orderModel);
+    GenericResponse finishOrder(@RequestBody OrderResponseModel orderModel) {
+        return orderService.finishOrder(orderModel);
     }
 
     @RequestMapping(value = "/isPacked", method = RequestMethod.GET)

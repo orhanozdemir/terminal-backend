@@ -16,26 +16,26 @@ public class LogController {
 
     private LogService logService;
 
-//    @Autowired
-//    public LogController(LogService logService) {
-//        this.logService = logService;
-//    }
-//
-//    @RequestMapping(value = "/myLogs", method = RequestMethod.POST)
-//    public List<OrderLog> findMyLogs(@RequestBody User user) {
-//        return logService.findMyLogs(user);
-//    }
-//
-//    @RequestMapping(value = "/leadership", method = RequestMethod.GET)
-//    public List<LeadershipResponseEntity> getLeadershipData(@RequestParam String type) {
-//        return logService.getLeadership(type);
-//    }
-//
-//    @RequestMapping(value = "/myStats", method = RequestMethod.POST)
-//    public StatsResponseModel findMyStats(@RequestBody User user) {
-//        return logService.getMyStats(user);
-//    }
-//
+    @Autowired
+    public LogController(LogService logService) {
+        this.logService = logService;
+    }
+
+    @RequestMapping(value = "/myLogs", method = RequestMethod.POST)
+    public List<OrderLog> findMyLogs() {
+        return logService.findMyLogs();
+    }
+
+    @RequestMapping(value = "/leadership", method = RequestMethod.GET)
+    public List<LeadershipResponseEntity> getLeadershipData(@RequestParam String type) {
+        return logService.getLeadership(type);
+    }
+
+    @RequestMapping(value = "/myStats", method = RequestMethod.POST)
+    public StatsResponseModel findMyStats() {
+        return logService.getMyStats();
+    }
+
 //    @RequestMapping(value = "/allStats", method = RequestMethod.GET)
 //    public void findAllStats() {
 //        logService.getAllStats();

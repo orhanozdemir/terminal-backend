@@ -21,7 +21,7 @@ public class Shelf {
     @JoinTable(name="shelf_shop", schema = "test", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="shelf_id"), inverseJoinColumns=@JoinColumn(name="shop_id"))
     private Shop shop;
 
-    private String type;
+    private ShelfType type;
     private int section;
     private int row;
 
@@ -45,7 +45,7 @@ public class Shelf {
 
     public Shelf() {}
 
-    public Shelf(Shop shop, String type, int section, int row, String name, String barcode, User createdBy, User updatedBy, Date createdAt, Date updatedAt, Boolean isActive) {
+    public Shelf(Shop shop, ShelfType type, int section, int row, String name, String barcode, User createdBy, User updatedBy, Date createdAt, Date updatedAt, Boolean isActive) {
         this.shop = shop;
         this.type = type;
         this.section = section;
@@ -75,11 +75,11 @@ public class Shelf {
         this.shop = shop;
     }
 
-    public String getType() {
+    public ShelfType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(ShelfType type) {
         this.type = type;
     }
 

@@ -2,15 +2,21 @@ package com.procsin.API.Service.Implementation.Pack;
 
 import com.procsin.API.DAO.Pack.LoginLogDao;
 import com.procsin.API.DAO.Pack.OrderLogDao;
+import com.procsin.API.DAO.UserDao;
 import com.procsin.API.Model.LeadershipResponseEntity;
+import com.procsin.API.Model.MyLogsResponseEntity;
 import com.procsin.API.Model.StatsResponseModel;
 import com.procsin.API.Service.Interface.Pack.LogService;
+import com.procsin.Application;
 import com.procsin.DB.Entity.Pack.LoginLog;
 import com.procsin.DB.Entity.Pack.OrderLog;
 import com.procsin.DB.Entity.User;
+import com.procsin.Static.Queries;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-
+import javax.persistence.EntityManager;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,10 +31,21 @@ public class LogServiceImpl implements LogService {
     private LoginLogDao loginLogRepository;
     @Autowired
     private OrderLogDao orderLogRepository;
+    @Autowired
+    private UserDao userRepository;
+
+    @Autowired
+    EntityManager em;
+
 //    @Autowired
 //    private MyLogsResponseRepository myLogsResponseRepository;
 //    @Autowired
 //    private LeadershipResponseRepository leadershipResponseRepository;
+
+    private User getActiveUser() {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userRepository.findByUsername(userDetails.getUsername());
+    }
 
     private Boolean isToday(Date date) {
         DateFormat format = new SimpleDateFormat("yyyyMMdd");
@@ -60,80 +77,32 @@ public class LogServiceImpl implements LogService {
         return loginLogRepository.save(loginLog);
     }
 
-//    @Override
-//    public List<LeadershipResponseEntity> getLeadership(String type) {
-//        List<LeadershipResponseEntity> responseModel = new ArrayList<LeadershipResponseEntity>();
-//
-//        if (type.equals(LeadershipResponseEntity.LeaderShipType.DAILY.toString())) {
-//            responseModel = leadershipResponseRepository.getLeadershipDataForToday();
-//        }
-//        else if (type.equals(LeadershipResponseEntity.LeaderShipType.MONTHLY.toString())) {
-//            responseModel = leadershipResponseRepository.getLeadershipDataForMonth();
-//        }
-//        else if (type.equals(LeadershipResponseEntity.LeaderShipType.ALL.toString())){
-//            responseModel = leadershipResponseRepository.getAllLeadershipData();
-//        }
-//
-////        List<OrderLog> logs = orderLogRepository.findAllByStatus(OrderLog.OrderStatus.KARGO_HAZIR);
-////        Map<User, LeadershipResponseEntity> map = new HashMap<User, LeadershipResponseEntity>();
-////        for (OrderLog log : logs) {
-////            if (map.get(log.getUser()) == null) {
-////                LeadershipResponseEntity model = new LeadershipResponseEntity();
-////                model.user = log.getUser();
-////                map.put(log.getUser(), model);
-////            }
-////            LeadershipResponseEntity temp = map.get(log.getUser());
-////            if (isToday(log.getDate())) {
-////                temp.dailyCost += log.getOrder().getTotalCost();
-////                temp.dailyProductCount += log.getOrder().getTotalProductCount();
-////                temp.dailyOrderCount++;
-////            }
-////            if (isThisMonth(log.getDate())) {
-////                temp.monthlyCost += log.getOrder().getTotalCost();
-////                temp.monthlyProductCount += log.getOrder().getTotalProductCount();
-////                temp.monthlyOrderCount++;
-////            }
-////            temp.allCost += log.getOrder().getTotalCost();
-////            temp.allProductCount += log.getOrder().getTotalProductCount();
-////            temp.allOrderCount++;
-////            map.put(log.getUser(), temp);
-////        }
-////        for (User user : map.keySet()) {
-////            responseModel.add(map.get(user));
-////        }
-//        return responseModel;
-//    }
-//
-//    @Override
-//    public StatsResponseModel getMyStats(User user) {
-//        DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-//        String today = format.format(new Date());
-//        String yesterday = getYesterdayDateString();
-//        MyLogsResponseEntity allStats = myLogsResponseRepository.findMyStats(user.getId());
-//        MyLogsResponseEntity todayStats = myLogsResponseRepository.findMyDailyStats(user.getId());
-//        return new StatsResponseModel(todayStats.totalOrderCount,allStats.totalOrderCount,todayStats.totalProductCount,allStats.totalProductCount,todayStats.totalCost,allStats.totalCost);
-//    }
-//
-//    @Override
-//    public List<OrderLog> findMyLogs(User user) {
-//        List<OrderLog> orderLogs = orderLogRepository.findPreviousOrderLogs(user.getId());
-//        return orderLogs;
-//    }
-//
-//    @Override
-//    public void getAllStats() {
-//        int count = 0;
-//        long total = 0;
-//        List<OrderLog> allFinishedLogs = orderLogRepository.findAllByStatus(OrderLog.OrderStatus.KARGO_HAZIR);
-//        for (OrderLog finishLog : allFinishedLogs) {
-//            OrderLog startLog = orderLogRepository.findStartLog(finishLog.getOrder().getId(), finishLog.getUser().getId());
-//            long seconds = (finishLog.getDate().getTime()-startLog.getDate().getTime())/1000;
-//            if (seconds > 0) {
-//                count++;
-//                total += seconds;
-//            }
-//        }
-//        System.out.print("123");
-//    }
+    @Override
+    public List<LeadershipResponseEntity> getLeadership(String type) {
+        List<LeadershipResponseEntity> responseModel = new ArrayList<LeadershipResponseEntity>();
+        if (type.equals(LeadershipResponseEntity.LeaderShipType.DAILY.toString())) {
+            return em.createNativeQuery(Queries.LEADERSHIP_DAILY_QUERY).getResultList();
+        }
+        else if (type.equals(LeadershipResponseEntity.LeaderShipType.MONTHLY.toString())) {
+            return em.createNativeQuery(Queries.LEADERSHIP_MONTHLY_QUERY).getResultList();
+        }
+        else if (type.equals(LeadershipResponseEntity.LeaderShipType.ALL.toString())){
+            return em.createNativeQuery(Queries.LEADERSHIP_ALL_QUERY).getResultList();
+        }
+        return responseModel;
+    }
+
+    @Override
+    public StatsResponseModel getMyStats() {
+        MyLogsResponseEntity allStats = (MyLogsResponseEntity) em.createNativeQuery(Queries.STATS_MY_ALL_STATS).setParameter("userId",getActiveUser().getId()).getSingleResult();
+        MyLogsResponseEntity todayStats = (MyLogsResponseEntity) em.createNativeQuery(Queries.STATS_MY_DAILY_STATS).setParameter("userId",getActiveUser().getId()).getSingleResult();
+        return new StatsResponseModel(todayStats.totalOrderCount,allStats.totalOrderCount,todayStats.totalProductCount,allStats.totalProductCount,todayStats.totalCost,allStats.totalCost);
+    }
+
+    @Override
+    public List<OrderLog> findMyLogs() {
+        List<OrderLog> orderLogs = orderLogRepository.findPreviousOrderLogs(getActiveUser().getId());
+        return orderLogs;
+    }
 
 }
