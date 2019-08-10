@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "Quantity", schema = "test", catalog = "PRS_SEVK")
+@Table(name = "Quantity", schema = "sevk", catalog = "PRS_SEVK")
 public class Quantity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,11 +17,11 @@ public class Quantity {
 //    private Product product;
 
     @ManyToOne
-    @JoinTable(name="quantity_shelf", schema = "test", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="quantity_id"), inverseJoinColumns=@JoinColumn(name="shelf_id"))
+    @JoinTable(name="quantity_shelf", schema = "sevk", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="quantity_id"), inverseJoinColumns=@JoinColumn(name="shelf_id"))
     private Shelf shelf;
 
     @ManyToOne
-    @JoinTable(name="quantity_enumeration", schema = "test", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="quantity_id"), inverseJoinColumns=@JoinColumn(name="enumeration_id"))
+    @JoinTable(name="quantity_enumeration", schema = "sevk", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="quantity_id"), inverseJoinColumns=@JoinColumn(name="enumeration_id"))
     private Enumeration enumeration;
 
     private String productCode;
@@ -31,7 +31,7 @@ public class Quantity {
     private int count;
 
     @ManyToOne
-    @JoinTable(name="quantity_createdBy", schema = "test", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="quantity_id"), inverseJoinColumns=@JoinColumn(name="account_id"))
+    @JoinTable(name="quantity_createdBy", schema = "sevk", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="quantity_id"), inverseJoinColumns=@JoinColumn(name="account_id"))
     private User createdBy;
 
     private Date createdAt;

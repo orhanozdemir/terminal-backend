@@ -1,5 +1,6 @@
 package com.procsin.API.Model.TSOFT;
 
+import java.util.Date;
 import java.util.List;
 
 public class OrderResponseModel {
@@ -9,20 +10,23 @@ public class OrderResponseModel {
     public String DeliveryName;
     public String DeliveryAddress;
     public double OrderTotalPrice;
+    public Date OrderDate;
     public List<ProductResponseModel> OrderDetails;
 
     public int totalProductCount;
 
     public OrderResponseModel() {}
 
-    public OrderResponseModel(String orderId, String orderCode, String deliveryName, String deliveryAddress, double orderTotalPrice, List<ProductResponseModel> orderDetails) {
-        OrderId = orderId;
-        OrderCode = orderCode;
-        DeliveryName = deliveryName;
-        DeliveryAddress = deliveryAddress;
-        OrderTotalPrice = orderTotalPrice;
-        OrderDetails = orderDetails;
-    }
+//    public OrderResponseModel(String orderId, String orderCode, String deliveryName, String deliveryAddress, double orderTotalPrice, String orderDate, List<ProductResponseModel> orderDetails, int totalProductCount) {
+//        OrderId = orderId;
+//        OrderCode = orderCode;
+//        DeliveryName = deliveryName;
+//        DeliveryAddress = deliveryAddress;
+//        OrderTotalPrice = orderTotalPrice;
+//        OrderDate = orderDate;
+//        OrderDetails = orderDetails;
+//        this.totalProductCount = totalProductCount;
+//    }
 
     public void setTotalProductCount() {
         for (ProductResponseModel product : OrderDetails) {

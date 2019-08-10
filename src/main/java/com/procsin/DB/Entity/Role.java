@@ -3,7 +3,7 @@ package com.procsin.DB.Entity;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "Role", schema = "test", catalog = "PRS_SEVK")
+@Table(name = "Role", schema = "sevk", catalog = "PRS_SEVK")
 public class Role {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

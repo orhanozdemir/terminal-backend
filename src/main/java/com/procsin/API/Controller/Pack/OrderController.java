@@ -3,10 +3,15 @@ package com.procsin.API.Controller.Pack;
 import com.procsin.API.Model.GenericResponse;
 import com.procsin.API.Model.OrderLogSuccessModel;
 import com.procsin.API.Model.TSOFT.OrderResponseModel;
-import com.procsin.API.Model.UpdateOrderRequestModel;
 import com.procsin.API.Service.Interface.Pack.OrderService;
+import com.procsin.DB.Entity.Pack.Orders;
+import com.procsin.DB.Entity.Pack.report.OrderReportResponseModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import javax.persistence.EntityManager;
+import java.util.List;
+import static com.procsin.Static.Queries.GET_FAILED_ORDERS;
+import static com.procsin.Static.Queries.ORDERS_BY_DATE;
 
 @RequestMapping("/order")
 @RestController

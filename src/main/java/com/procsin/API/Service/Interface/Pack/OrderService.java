@@ -11,5 +11,4 @@ public interface OrderService {
     GenericResponse updateToPackCancel(String orderCode);
     GenericResponse finishOrder(OrderResponseModel orderModel);
     Boolean isPackedBefore(String orderCode);
-
 }

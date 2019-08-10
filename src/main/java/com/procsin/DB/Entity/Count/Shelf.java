@@ -7,7 +7,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "Shelf", schema = "test", catalog = "PRS_SEVK")
+@Table(name = "Shelf", schema = "sevk", catalog = "PRS_SEVK")
 public class Shelf {
 
     public enum ShelfType {
@@ -18,7 +18,7 @@ public class Shelf {
     private Long id;
 
     @ManyToOne
-    @JoinTable(name="shelf_shop", schema = "test", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="shelf_id"), inverseJoinColumns=@JoinColumn(name="shop_id"))
+    @JoinTable(name="shelf_shop", schema = "sevk", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="shelf_id"), inverseJoinColumns=@JoinColumn(name="shop_id"))
     private Shop shop;
 
     private ShelfType type;
@@ -31,11 +31,11 @@ public class Shelf {
     private String barcode;
 
     @ManyToOne
-    @JoinTable(name="shelf_createdBy", schema = "test", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="shelf_id"), inverseJoinColumns=@JoinColumn(name="account_id"))
+    @JoinTable(name="shelf_createdBy", schema = "sevk", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="shelf_id"), inverseJoinColumns=@JoinColumn(name="account_id"))
     private User createdBy;
 
     @ManyToOne
-    @JoinTable(name="shelf_updatedBy", schema = "test", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="shelf_id"), inverseJoinColumns=@JoinColumn(name="account_id"))
+    @JoinTable(name="shelf_updatedBy", schema = "sevk", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="shelf_id"), inverseJoinColumns=@JoinColumn(name="account_id"))
     private User updatedBy;
 
     private Date createdAt;

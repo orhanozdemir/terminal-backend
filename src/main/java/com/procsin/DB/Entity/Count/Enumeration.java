@@ -7,7 +7,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "Enumeration", schema = "test", catalog = "PRS_SEVK")
+@Table(name = "Enumeration", schema = "sevk", catalog = "PRS_SEVK")
 public class Enumeration {
 
     public enum EnumStatus {
@@ -18,7 +18,7 @@ public class Enumeration {
     private Long id;
 
     @ManyToOne
-    @JoinTable(name="enumeration_shop", schema = "test", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="enumeration_id"), inverseJoinColumns=@JoinColumn(name="shop_id"))
+    @JoinTable(name="enumeration_shop", schema = "sevk", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="enumeration_id"), inverseJoinColumns=@JoinColumn(name="shop_id"))
     private Shop shop;
 
 //    @ManyToMany
@@ -32,11 +32,11 @@ public class Enumeration {
     private Date updatedAt;
 
     @ManyToOne
-    @JoinTable(name="enumeration_createdBy", schema = "test", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="enumeration_id"), inverseJoinColumns=@JoinColumn(name="account_id"))
+    @JoinTable(name="enumeration_createdBy", schema = "sevk", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="enumeration_id"), inverseJoinColumns=@JoinColumn(name="account_id"))
     private User createdBy;
 
     @ManyToOne
-    @JoinTable(name="enumeration_updatedBy", schema = "test", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="enumeration_id"), inverseJoinColumns=@JoinColumn(name="account_id"))
+    @JoinTable(name="enumeration_updatedBy", schema = "sevk", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="enumeration_id"), inverseJoinColumns=@JoinColumn(name="account_id"))
     private User updatedBy;
 
     public Enumeration() {}

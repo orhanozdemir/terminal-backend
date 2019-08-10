@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-@Table(name = "Account", schema = "test", catalog = "PRS_SEVK")
+@Table(name = "Account", schema = "sevk", catalog = "PRS_SEVK")
 public class User {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,7 +16,7 @@ public class User {
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(name = "account_role", schema = "test", catalog = "PRS_SEVK", joinColumns = {
+    @JoinTable(name = "account_role", schema = "sevk", catalog = "PRS_SEVK", joinColumns = {
             @JoinColumn(name = "account_id") }, inverseJoinColumns = {
             @JoinColumn(name = "role_id") })
     private Set<Role> roles;
@@ -24,14 +24,17 @@ public class User {
     private String name;
     private String surname;
 
+    private Boolean isActive;
+
     public User() {}
 
-    public User(String username, String password, Set<Role> roles, String name, String surname) {
+    public User(String username, String password, Set<Role> roles, String name, String surname, Boolean isActive) {
         this.username = username;
         this.password = password;
         this.roles = roles;
         this.name = name;
         this.surname = surname;
+        this.isActive = isActive;
     }
 
     public long getId() {
@@ -80,5 +83,13 @@ public class User {
 
     public void setSurname(String surname) {
         this.surname = surname;
+    }
+
+    public Boolean getActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
     }
 }

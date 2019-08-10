@@ -28,11 +28,17 @@ public interface OrderLogDao extends CrudRepository<OrderLog,Long> {
 
     List<OrderLog> findAllByOrder(Orders order);
 
+    @Query(value = "SELECT * FROM PRS_SEVK.sevk.OrderLog WHERE order_id = :orderId", nativeQuery = true)
+    List<OrderLog> getOrderLogs(@Param("orderId") Long orderId);
+
     @Query(value = "SELECT TOP 1 o.* FROM PRS_SEVK.sevk.OrderLog o, PRS_SEVK.sevk.Orders a WHERE o.order_id = a.id and o.status = 1 and a.orderCode = :orderCode", nativeQuery = true)
     OrderLog findReadyByOrderCode(@Param("orderCode") String orderCode);
 
     //STATS
     @Query(value = "SELECT TOP 1 * FROM PRS_SEVK.sevk.OrderLog WHERE user_id = :userId AND order_id = :orderId AND status = 0 ORDER BY id DESC", nativeQuery = true)
     OrderLog findStartLog(@Param("orderId") Long orderId, @Param("userId") Long userId);
+
+    @Query(value = "SELECT a.* FROM PRS_SEVK.sevk.OrderLog a, PRS_SEVK.sevk.Orders b WHERE a.order_id = b.id AND b.orderCode = :orderCode", nativeQuery = true)
+    List<OrderLog> getOrderDetails(@Param("orderCode") String orderCode);
 
 }

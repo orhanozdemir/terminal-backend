@@ -6,24 +6,24 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "Capacity", schema = "test", catalog = "PRS_SEVK")
+@Table(name = "Capacity", schema = "sevk", catalog = "PRS_SEVK")
 public class Capacity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinTable(name="capacity_shelf", schema = "test", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="capacity_id"), inverseJoinColumns=@JoinColumn(name="shelf_id"))
+    @JoinTable(name="capacity_shelf", schema = "sevk", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="capacity_id"), inverseJoinColumns=@JoinColumn(name="shelf_id"))
     private Shelf shelf;
 
     @ManyToOne
-    @JoinTable(name="capacity_enumeration", schema = "test", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="capacity_id"), inverseJoinColumns=@JoinColumn(name="enumeration_id"))
+    @JoinTable(name="capacity_enumeration", schema = "sevk", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="capacity_id"), inverseJoinColumns=@JoinColumn(name="enumeration_id"))
     private Enumeration enumeration;
 
     private int count;
 
     @ManyToOne
-    @JoinTable(name="capacity_createdBy", schema = "test", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="capacity_id"), inverseJoinColumns=@JoinColumn(name="account_id"))
+    @JoinTable(name="capacity_createdBy", schema = "sevk", catalog = "PRS_SEVK", joinColumns=@JoinColumn(name="capacity_id"), inverseJoinColumns=@JoinColumn(name="account_id"))
     private User createdBy;
 
     private Date createdAt;
