@@ -18,7 +18,7 @@ public interface OrderDao extends CrudRepository<Orders, Long> {
     @Query(value = "SELECT TOP 100 * FROM PRS_SEVK.sevk.Orders ORDER BY orderDate DESC", nativeQuery = true)
     List<Orders> findLastHundredOrders();
 
-    @Query(value = "SELECT TOP 300 * FROM PRS_SEVK.sevk.Orders WHERE orderDate BETWEEN :fromDate AND :toDate", nativeQuery = true)
+    @Query(value = "SELECT TOP 300 * FROM PRS_SEVK.sevk.Orders WHERE orderDate BETWEEN :fromDate AND :toDate ORDER BY orderDate DESC", nativeQuery = true)
     List<Orders> findOrdersByDate(@Param("fromDate") String fromDate, @Param("toDate") String toDate);
 
     @Query(value = "SELECT * FROM PRS_SEVK.sevk.Orders WHERE orderDate IS NULL", nativeQuery = true)

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.persistence.EntityManager;
+import java.util.Date;
 import java.util.List;
 
 import static com.procsin.Static.Queries.GET_FAILED_ORDERS;
@@ -33,8 +34,8 @@ public class ReportController {
 //        return reportService.getOrders(fromDate,toDate);
 //    }
     @RequestMapping(value = "/orders", method = RequestMethod.GET)
-    List<Orders> getOrders() {
-        return reportService.getOrders(null,null);
+    List<Orders> getOrders(@RequestParam(value = "fromDate", required = false) String fromDate, @RequestParam(value = "toDate", required = false) String toDate) {
+        return reportService.getOrders(fromDate,toDate);
     }
 
     @RequestMapping(value = "/orderLogs", method = RequestMethod.GET)
@@ -43,8 +44,8 @@ public class ReportController {
     }
 
     @RequestMapping(value = "/failedList", method = RequestMethod.GET)
-    List<OrderReportResponseModel> getFailedOrders() {
-        return em.createNativeQuery(GET_FAILED_ORDERS, OrderReportResponseModel.class).getResultList();
+    List<Orders> getFailedOrders() {
+        return em.createNativeQuery(GET_FAILED_ORDERS, Orders.class).getResultList();
     }
     @RequestMapping(value = "/updateFailedStatus", method = RequestMethod.POST)
     Orders updateFailedStatus(@RequestParam Boolean didFail, @RequestParam String orderCode) {

@@ -24,8 +24,9 @@ public class Queries {
             "AND date BETWEEN convert(date, GETDATE()) AND DATEADD(day, 1, convert(date, GETDATE())) " +
             "GROUP BY username";
 
-    public static String GET_FAILED_ORDERS = "SELECT NEWID() as id, a.deliveryName, a.orderCode, a.totalCost, a.totalProductCount, c.username, b.date FROM PRS_SEVK.sevk.Orders a, PRS_SEVK.sevk.OrderLog b, PRS_SEVK.sevk.Account c " +
-            "WHERE b.user_id = c.id AND a.id = b.order_id AND b.status = 1 AND a.didFail = 1";
+    public static String GET_FAILED_ORDERS = "SELECT TOP 20 a.* FROM PRS_SEVK.sevk.Orders a, PRS_SEVK.sevk.OrderLog b, PRS_SEVK.sevk.Account c\n" +
+            "WHERE b.user_id = c.id AND a.id = b.order_id AND b.status = 1 AND a.didFail = 1\n" +
+            "ORDER BY orderDate DESC";
     public static String GET_FAIL_STATS = "SELECT * FROM " +
             "(SELECT COUNT(*) as 'failCount' FROM PRS_SEVK.sevk.Orders WHERE didFail = 1) as a, " +
             "(SELECT COUNT(*) as 'orderCount' FROM PRS_SEVK.sevk.Orders) as b";
