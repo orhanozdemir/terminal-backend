@@ -1,7 +1,7 @@
 package com.procsin.API.Model;
 
 import com.procsin.API.Model.TSOFT.OrderResponseModel;
-import com.procsin.DB.Entity.User;
+import com.procsin.DB.Entity.UserManagement.User;
 
 public class UpdateOrderRequestModel {
 

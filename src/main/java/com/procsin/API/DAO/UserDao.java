@@ -1,6 +1,6 @@
 package com.procsin.API.DAO;
 
-import com.procsin.DB.Entity.User;
+import com.procsin.DB.Entity.UserManagement.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

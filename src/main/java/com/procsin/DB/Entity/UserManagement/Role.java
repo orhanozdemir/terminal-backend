@@ -1,4 +1,4 @@
-package com.procsin.DB.Entity;
+package com.procsin.DB.Entity.UserManagement;
 
 import javax.persistence.*;
 

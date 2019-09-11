@@ -1,6 +1,6 @@
 package com.procsin.API.Model;
 
-import com.procsin.DB.Entity.User;
+import com.procsin.DB.Entity.UserManagement.User;
 
 public class AuthToken {
 

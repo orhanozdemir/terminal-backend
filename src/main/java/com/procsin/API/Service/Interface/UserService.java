@@ -1,6 +1,6 @@
 package com.procsin.API.Service.Interface;
 
-import com.procsin.DB.Entity.User;
+import com.procsin.DB.Entity.UserManagement.User;
 
 import java.util.List;
 

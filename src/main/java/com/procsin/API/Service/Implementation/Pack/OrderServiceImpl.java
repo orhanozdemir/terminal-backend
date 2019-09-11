@@ -9,12 +9,11 @@ import com.procsin.API.Model.GenericResponse;
 import com.procsin.API.Model.OrderLogSuccessModel;
 import com.procsin.API.Model.TSOFT.OrderResponseModel;
 import com.procsin.API.Service.Interface.Pack.OrderService;
-import com.procsin.Application;
 import com.procsin.DB.Entity.ErrorLog;
 import com.procsin.DB.Entity.Pack.Campaign;
 import com.procsin.DB.Entity.Pack.OrderLog;
 import com.procsin.DB.Entity.Pack.Orders;
-import com.procsin.DB.Entity.User;
+import com.procsin.DB.Entity.UserManagement.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -62,13 +61,15 @@ public class OrderServiceImpl implements OrderService {
             OrderLog lastLog = logs.get(logs.size() - 1);
             if (lastLog != null) {
                 if (lastLog.getStatus() == OrderLog.OrderStatus.KARGO_HAZIR) {
-                    String errorMessage = "Bu sipariş daha önce tamamlanmış";
-                    createErrorLog("Order-1001",errorMessage);
+                    String errorCode = "Order-1001";
+                    String errorMessage = errorCode + "/" + "Bu sipariş daha önce tamamlanmış";
+                    createErrorLog(errorCode,errorMessage + " / " + order.getOrderCode());
                     throw new IllegalStateException(errorMessage);
                 }
                 if (lastLog.getStatus() == OrderLog.OrderStatus.URUN_PAKETLENIYOR) {
-                    String errorMessage = "Bu sipariş daha önce işleme alınmış";
-                    createErrorLog("Order-1002",errorMessage);
+                    String errorCode = "Order-1002";
+                    String errorMessage = errorCode + "/" + "Bu sipariş daha önce işleme alınmış";
+                    createErrorLog(errorCode,errorMessage + " / " + order.getOrderCode());
                     throw new IllegalStateException(errorMessage);
                 }
             }
@@ -87,13 +88,15 @@ public class OrderServiceImpl implements OrderService {
     public GenericResponse updateToSupplement(OrderResponseModel orderModel) {
         Orders order = orderRepository.findByOrderCode(orderModel.OrderCode);
         if (order == null) {
-            String errorMessage = "Bu sipariş hiç oluşturulmamış";
-            createErrorLog("Order-1003",errorMessage);
+            String errorCode = "Order-1003";
+            String errorMessage = errorCode + "/" + "Bu sipariş hiç oluşturulmamış";
+            createErrorLog(errorCode,errorMessage + " / " + orderModel.OrderCode);
             throw new IllegalStateException(errorMessage);
         }
         if (isPackedBefore(orderModel.OrderCode)) {
-            String errorMessage = "Bu sipariş daha önce tamamlanmış";
-            createErrorLog("Order-1004",errorMessage);
+            String errorCode = "Order-1004";
+            String errorMessage = errorCode + "/" + "Bu sipariş daha önce tamamlanmış";
+            createErrorLog(errorCode,errorMessage + " / " + orderModel.OrderCode);
             throw new IllegalStateException(errorMessage);
         }
 
@@ -107,13 +110,15 @@ public class OrderServiceImpl implements OrderService {
     public GenericResponse updateToPackCancel(String orderCode) {
         Orders order = orderRepository.findByOrderCode(orderCode);
         if (order == null) {
-            String errorMessage = "Bu sipariş hiç oluşturulmamış";
-            createErrorLog("Order-1005",errorMessage);
+            String errorCode = "Order-1005";
+            String errorMessage = errorCode + "/" + "Bu sipariş hiç oluşturulmamış";
+            createErrorLog(errorCode,errorMessage + " / " + orderCode);
             throw new IllegalStateException(errorMessage);
         }
         if (isPackedBefore(orderCode)) {
-            String errorMessage = "Bu sipariş daha önce tamamlanmış";
-            createErrorLog("Order-1006",errorMessage);
+            String errorCode = "Order-1006";
+            String errorMessage = errorCode + "/" + "Bu sipariş daha önce tamamlanmış";
+            createErrorLog(errorCode,errorMessage + " / " + orderCode);
             throw new IllegalStateException(errorMessage);
         }
 
@@ -128,14 +133,14 @@ public class OrderServiceImpl implements OrderService {
     public GenericResponse finishOrder(OrderResponseModel orderModel) {
         if (isPackedBefore(orderModel.OrderCode)) {
             String errorMessage = "Bu sipariş daha önce tamamlanmış";
-            createErrorLog("Order-1007",errorMessage);
+            createErrorLog("Order-1007",errorMessage + " / " + orderModel.OrderCode);
             throw new IllegalStateException(errorMessage);
         }
         else {
             Orders order = orderRepository.findByOrderCode(orderModel.OrderCode);
             if (order == null) {
                 String errorMessage = "Bu sipariş hiç oluşturulmamış";
-                createErrorLog("Order-1008",errorMessage);
+                createErrorLog("Order-1008",errorMessage + " / " + orderModel.OrderCode);
                 throw new IllegalStateException(errorMessage);
             }
             OrderLog finishLog = new OrderLog(order, OrderLog.OrderStatus.KARGO_HAZIR, getActiveUser());

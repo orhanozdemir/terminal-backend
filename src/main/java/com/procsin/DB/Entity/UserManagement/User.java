@@ -1,4 +1,4 @@
-package com.procsin.DB.Entity;
+package com.procsin.DB.Entity.UserManagement;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -26,15 +26,20 @@ public class User {
 
     private Boolean isActive;
 
+    private String platform;
+    private String pushToken;
+
     public User() {}
 
-    public User(String username, String password, Set<Role> roles, String name, String surname, Boolean isActive) {
+    public User(String username, String password, Set<Role> roles, String name, String surname, Boolean isActive, String platform, String pushToken) {
         this.username = username;
         this.password = password;
         this.roles = roles;
         this.name = name;
         this.surname = surname;
         this.isActive = isActive;
+        this.platform = platform;
+        this.pushToken = pushToken;
     }
 
     public long getId() {
@@ -91,5 +96,21 @@ public class User {
 
     public void setActive(Boolean active) {
         isActive = active;
+    }
+
+    public String getPlatform() {
+        return platform;
+    }
+
+    public void setPlatform(String platform) {
+        this.platform = platform;
+    }
+
+    public String getPushToken() {
+        return pushToken;
+    }
+
+    public void setPushToken(String pushToken) {
+        this.pushToken = pushToken;
     }
 }

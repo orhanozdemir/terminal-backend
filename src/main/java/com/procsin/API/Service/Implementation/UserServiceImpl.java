@@ -2,7 +2,7 @@ package com.procsin.API.Service.Implementation;
 
 import com.procsin.API.DAO.UserDao;
 import com.procsin.API.Service.Interface.UserService;
-import com.procsin.DB.Entity.User;
+import com.procsin.DB.Entity.UserManagement.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
