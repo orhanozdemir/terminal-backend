@@ -1,6 +1,6 @@
 package com.procsin.DB.Entity.Count;
 
-import com.procsin.DB.Entity.User;
+import com.procsin.DB.Entity.UserManagement.User;
 
 import javax.persistence.*;
 import java.util.Date;

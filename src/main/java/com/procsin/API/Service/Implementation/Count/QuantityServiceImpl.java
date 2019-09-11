@@ -4,7 +4,7 @@ import com.procsin.API.DAO.Count.QuantityDao;
 import com.procsin.API.DAO.UserDao;
 import com.procsin.API.Service.Interface.Count.QuantityService;
 import com.procsin.DB.Entity.Count.Quantity;
-import com.procsin.DB.Entity.User;
+import com.procsin.DB.Entity.UserManagement.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

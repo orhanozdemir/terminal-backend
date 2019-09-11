@@ -8,7 +8,7 @@ import com.procsin.API.Model.AddShelvesRequestModel;
 import com.procsin.API.Service.Interface.Count.ShelfService;
 import com.procsin.DB.Entity.Count.Shelf;
 import com.procsin.DB.Entity.Shop;
-import com.procsin.DB.Entity.User;
+import com.procsin.DB.Entity.UserManagement.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -2,7 +2,7 @@ package com.procsin.API.DAO.Count;
 
 import com.procsin.DB.Entity.Count.Enumeration;
 import com.procsin.DB.Entity.Shop;
-import com.procsin.DB.Entity.User;
+import com.procsin.DB.Entity.UserManagement.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import java.util.Date;
