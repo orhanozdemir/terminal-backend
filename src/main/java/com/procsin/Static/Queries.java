@@ -36,4 +36,12 @@ public class Queries {
     public static String ORDERS_BY_DATE = "SELECT NEWID() as id, a.deliveryName, a.orderCode, a.totalCost, a.totalProductCount, c.username, b.date FROM PRS_SEVK.sevk.Orders a, PRS_SEVK.sevk.OrderLog b, PRS_SEVK.sevk.Account c\n" +
             "WHERE b.user_id = c.id AND a.id = b.order_id AND b.status = 1 AND b.date BETWEEN :fromDate AND :toDate";
 
+    public static String PRODUCT_LIST = "SELECT a.ItemCode as 'productCode', b.ItemDescription as 'name' FROM PRS_MAGAZACILIK.dbo.cdItem a\n" +
+            "LEFT JOIN PRS_MAGAZACILIK.dbo.cdItemDesc b ON a.ItemCode = b.ItemCode\n" +
+            "WHERE a.ItemCode NOT LIKE 'Z%' AND a.ItemCode NOT LIKE 'SA.94%' AND a.ItemCode != 'DV'\n" +
+            "  AND a.UseStore = 1 AND a.ItemTypeCode = 1";
+
+    public static String GET_ONLINE_ORDER = "USE PROCSIN_V3\n" +
+            "EXEC usp_Getsiparis :orderCode";
+
 }
