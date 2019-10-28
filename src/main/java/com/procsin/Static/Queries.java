@@ -44,4 +44,6 @@ public class Queries {
     public static String GET_ONLINE_ORDER = "USE PROCSIN_V3\n" +
             "EXEC usp_Getsiparis :orderCode";
 
+    public static String GET_INVOICE_DETAILS = "SELECT TOP 1 NEWID() as id, InternalDescription, InvoiceNumber, EInvoiceNumber FROM PROCSIN_V3.dbo.AllInvoices WHERE InternalDescription = :InternalDescription";
+
 }

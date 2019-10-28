@@ -24,4 +24,7 @@ public interface OrderDao extends CrudRepository<Orders, Long> {
     @Query(value = "SELECT * FROM PRS_SEVK.sevk.Orders WHERE orderDate IS NULL", nativeQuery = true)
     List<Orders> findOrdersWithoutDate();
 
+    @Query(value = "SELECT * FROM PRS_SEVK.sevk.Orders WHERE invoiceRefNumber IS NULL", nativeQuery = true)
+    List<Orders> findOrdersWithoutInvoiceRefNumber();
+
 }

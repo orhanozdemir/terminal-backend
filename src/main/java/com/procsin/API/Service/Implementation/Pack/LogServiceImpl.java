@@ -1,5 +1,6 @@
 package com.procsin.API.Service.Implementation.Pack;
 
+import com.procsin.API.DAO.Pack.FixLogDao;
 import com.procsin.API.DAO.Pack.LoginLogDao;
 import com.procsin.API.DAO.Pack.OrderLogDao;
 import com.procsin.API.DAO.UserDao;
@@ -7,6 +8,7 @@ import com.procsin.API.Model.LeadershipResponseEntity;
 import com.procsin.API.Model.MyLogsResponseEntity;
 import com.procsin.API.Model.StatsResponseModel;
 import com.procsin.API.Service.Interface.Pack.LogService;
+import com.procsin.DB.Entity.Pack.FixLog;
 import com.procsin.DB.Entity.Pack.LoginLog;
 import com.procsin.DB.Entity.Pack.OrderLog;
 import com.procsin.DB.Entity.UserManagement.User;
@@ -30,6 +32,8 @@ public class LogServiceImpl implements LogService {
     private LoginLogDao loginLogRepository;
     @Autowired
     private OrderLogDao orderLogRepository;
+    @Autowired
+    private FixLogDao fixLogRepository;
     @Autowired
     private UserDao userRepository;
 
@@ -74,6 +78,16 @@ public class LogServiceImpl implements LogService {
     @Override
     public LoginLog createLoginLog(LoginLog loginLog) {
         return loginLogRepository.save(loginLog);
+    }
+
+    @Override
+    public FixLog createFixLog(String orderCode, OrderLog.OrderStatus toStatus) {
+        FixLog fixLog = new FixLog();
+        fixLog.setOrderCode(orderCode);
+        fixLog.setToStatus(toStatus);
+        fixLog.setUser(getActiveUser());
+        fixLog.setDate(new Date());
+        return fixLogRepository.save(fixLog);
     }
 
     @Override

@@ -3,9 +3,12 @@ package com.procsin.API.Controller.Pack;
 import com.procsin.API.Model.GenericResponse;
 import com.procsin.API.Model.OrderLogSuccessModel;
 import com.procsin.API.Model.TSOFT.OrderResponseModel;
+import com.procsin.API.Service.Interface.Pack.IISService;
 import com.procsin.API.Service.Interface.Pack.OrderService;
 import com.procsin.DB.Entity.Pack.Orders;
 import com.procsin.DB.Entity.Pack.report.OrderReportResponseModel;
+import com.procsin.Retrofit.Interfaces.IISInterface;
+import com.procsin.Retrofit.Models.InvoiceResponseModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import javax.persistence.EntityManager;
@@ -18,6 +21,9 @@ import static com.procsin.Static.Queries.ORDERS_BY_DATE;
 public class OrderController {
 
     private OrderService orderService;
+
+    @Autowired
+    IISService iisService;
 
     @Autowired
     public OrderController(OrderService orderService) {
@@ -44,31 +50,35 @@ public class OrderController {
 //        return orderService.finishOrder(model.username, model.orderCode);
 //    }
 
-    @RequestMapping(value = "/prepareOrder", method = RequestMethod.POST)
-    OrderLogSuccessModel prepareOrder(@RequestBody OrderResponseModel orderModel) {
-        return orderService.prepareOrder(orderModel);
-    }
-
-    @RequestMapping(value = "/updateToSupplement", method = RequestMethod.POST)
-    GenericResponse updateToSupplement(@RequestBody OrderResponseModel orderModel) {
-        return orderService.updateToSupplement(orderModel);
-    }
-
-    @RequestMapping(value = "/updateToPackCancel", method = RequestMethod.POST)
-    GenericResponse updateToPackCancel(@RequestBody OrderResponseModel orderModel) {
-        return orderService.updateToPackCancel(orderModel.OrderCode);
-    }
-
-    @RequestMapping(value = "/finishOrder", method = RequestMethod.POST)
-    GenericResponse finishOrder(@RequestBody OrderResponseModel orderModel) {
-        return orderService.finishOrder(orderModel);
-    }
-
-    @RequestMapping(value = "/isPacked", method = RequestMethod.GET)
-    GenericResponse isPackedBefore(@RequestParam String orderCode) {
-        GenericResponse response = new GenericResponse();
-        response.success = orderService.isPackedBefore(orderCode);
-        return response;
-    }
-
+//    @RequestMapping(value = "/prepareOrder", method = RequestMethod.POST)
+//    OrderLogSuccessModel prepareOrder(@RequestBody OrderResponseModel orderModel) {
+//        return orderService.prepareOrder(orderModel);
+//    }
+//
+//    @RequestMapping(value = "/updateToSupplement", method = RequestMethod.POST)
+//    GenericResponse updateToSupplement(@RequestBody OrderResponseModel orderModel) {
+//        return orderService.updateToSupplement(orderModel);
+//    }
+//
+//    @RequestMapping(value = "/updateToPackCancel", method = RequestMethod.POST)
+//    GenericResponse updateToPackCancel(@RequestBody OrderResponseModel orderModel) {
+//        return orderService.updateToPackCancel(orderModel.OrderCode);
+//    }
+//
+//    @RequestMapping(value = "/finishOrder", method = RequestMethod.POST)
+//    GenericResponse finishOrder(@RequestBody OrderResponseModel orderModel) {
+//        return orderService.finishOrder(orderModel);
+//    }
+//
+//    @RequestMapping(value = "/isPacked", method = RequestMethod.GET)
+//    GenericResponse isPackedBefore(@RequestParam String orderCode) {
+//        GenericResponse response = new GenericResponse();
+//        response.success = orderService.isPackedBefore(orderCode);
+//        return response;
+//    }
+//
+//    @RequestMapping(value = "/createInvoice", method = RequestMethod.GET)
+//    InvoiceResponseModel createPreparedOrderInvoice(@RequestParam String orderCode) {
+//        return orderService.createInvoiceFromOrderCode(orderCode);
+//    }
 }

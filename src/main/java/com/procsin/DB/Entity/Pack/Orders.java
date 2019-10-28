@@ -1,6 +1,8 @@
 package com.procsin.DB.Entity.Pack;
 
 import com.procsin.API.Model.TSOFT.OrderResponseModel;
+import com.procsin.Retrofit.Models.TSoft.OrderModel;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -20,25 +22,34 @@ public class Orders {
 
     private Boolean didFail;
 
-    @ManyToOne
-    private PttBarcode pttBarcode;
+    private String invoiceCode;
+    private String invoiceRefNumber;
 
     public Orders() {}
 
-    public Orders(String orderCode, String deliveryName, double totalCost, int totalProductCount, Date orderDate, Boolean didFail, PttBarcode pttBarcode) {
+    public Orders(String orderCode, String deliveryName, double totalCost, int totalProductCount, Date orderDate, Boolean didFail, String invoiceCode, String invoiceRefNumber) {
         this.orderCode = orderCode;
         this.deliveryName = deliveryName;
         this.totalCost = totalCost;
         this.totalProductCount = totalProductCount;
         this.orderDate = orderDate;
         this.didFail = didFail;
-        this.pttBarcode = pttBarcode;
+        this.invoiceCode = invoiceCode;
+        this.invoiceRefNumber = invoiceRefNumber;
     }
 
     public Orders(OrderResponseModel model) {
         this.orderCode = model.OrderCode;
         this.deliveryName = model.DeliveryName;
         this.totalCost = model.OrderTotalPrice;
+        this.totalProductCount = model.totalProductCount;
+    }
+
+    public Orders(OrderModel model) {
+        this.orderCode = model.OrderCode;
+        this.deliveryName = model.DeliveryName;
+        this.totalCost = model.OrderTotalPrice;
+        this.orderDate = model.OrderDate;
         this.totalProductCount = model.totalProductCount;
     }
 
@@ -98,12 +109,19 @@ public class Orders {
         this.didFail = didFail;
     }
 
-    public PttBarcode getPttBarcode() {
-        return pttBarcode;
+    public String getInvoiceCode() {
+        return invoiceCode;
     }
 
-    public void setPttBarcode(PttBarcode pttBarcode) {
-        this.pttBarcode = pttBarcode;
+    public void setInvoiceCode(String invoiceCode) {
+        this.invoiceCode = invoiceCode;
     }
 
+    public String getInvoiceRefNumber() {
+        return invoiceRefNumber;
+    }
+
+    public void setInvoiceRefNumber(String invoiceRefNumber) {
+        this.invoiceRefNumber = invoiceRefNumber;
+    }
 }

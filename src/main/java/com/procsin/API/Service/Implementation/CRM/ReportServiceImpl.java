@@ -2,6 +2,7 @@ package com.procsin.API.Service.Implementation.CRM;
 
 import com.procsin.API.DAO.Pack.OrderDao;
 import com.procsin.API.DAO.Pack.OrderLogDao;
+import com.procsin.API.Model.ResponseModel.AllInvoicesResponseModel;
 import com.procsin.API.Model.ResponseModel.FailStatsResponseModel;
 import com.procsin.API.Model.TSOFT.OrderResponseModel;
 import com.procsin.API.Service.Interface.CRM.ReportService;
@@ -13,7 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+
+import javax.persistence.EntityManager;
 import java.util.List;
+
+import static com.procsin.Static.Queries.GET_INVOICE_DETAILS;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -23,6 +28,9 @@ public class ReportServiceImpl implements ReportService {
 
     @Autowired
     private OrderLogDao orderLogRepository;
+
+    @Autowired
+    private EntityManager em;
 
     @Override
     public List<Orders> getOrders(String fromDate, String toDate) {
@@ -66,18 +74,34 @@ public class ReportServiceImpl implements ReportService {
             MultiValueMap<String, String > params = new LinkedMultiValueMap<String, String>();
             params.add("OrderCode",order.getOrderCode());
             params.add("OrderStatusId", "2,3,4,5,6,7,8,9,10,11,12,13,1202,1203,1204");
+            params.add("Archive","1");
             OrderResponseDataModel tempData = NetworkClient.getInstance().doPost("/order2/getOrders", params, OrderResponseDataModel.class);
             if (tempData != null && tempData.data != null && tempData.data.size() > 0) {
                 OrderResponseModel temp = tempData.data.get(0);
                 order.setOrderDate(temp.OrderDate);
                 orderRepository.save(order);
             }
-//            Date orderDate = null;
-//            try {
-//                orderDate = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ssZ").parse(temp.OrderDate);
-//            } catch (ParseException e) {
-//                e.printStackTrace();
-//            }
+        }
+    }
+
+    @Override
+    public void setOrderInvoices() {
+        List<Orders> orders = orderRepository.findOrdersWithoutInvoiceRefNumber();
+        for (Orders order : orders) {
+            try {
+                AllInvoicesResponseModel response = (AllInvoicesResponseModel) em.createNativeQuery(GET_INVOICE_DETAILS,AllInvoicesResponseModel.class)
+                        .setParameter("InternalDescription",order.getOrderCode()).getSingleResult();
+                if(!response.InvoiceNumber.isEmpty()) {
+                    order.setInvoiceRefNumber(response.InvoiceNumber);
+                }
+                if(!response.EInvoiceNumber.isEmpty()) {
+                    order.setInvoiceCode(response.EInvoiceNumber);
+                }
+                orderRepository.save(order);
+            }
+            catch (Exception e) {
+                System.out.println(order.getOrderCode());
+            }
         }
     }
 

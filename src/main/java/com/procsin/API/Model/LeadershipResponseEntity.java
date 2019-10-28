@@ -2,8 +2,10 @@ package com.procsin.API.Model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "LeadershipResponseEntity", schema = "responses", catalog = "PRS_SEVK")
 public class LeadershipResponseEntity {
 
     public enum LeaderShipType {

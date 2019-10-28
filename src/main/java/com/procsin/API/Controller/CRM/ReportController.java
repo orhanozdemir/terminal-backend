@@ -61,4 +61,9 @@ public class ReportController {
         reportService.setOrderDates();
     }
 
+    @RequestMapping(value = "/setOrderInvoices", method = RequestMethod.GET)
+    void setOrderInvoices() {
+        reportService.setOrderInvoices();
+    }
+
 }
