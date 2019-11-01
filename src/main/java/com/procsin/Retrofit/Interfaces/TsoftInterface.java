@@ -1,6 +1,5 @@
 package com.procsin.Retrofit.Interfaces;
 
-import com.procsin.API.Model.GenericResponse;
 import com.procsin.API.Model.TSOFT.GenericTsoftResponseModel;
 import com.procsin.Retrofit.Models.TSoft.OrderDataModel;
 import retrofit2.Call;
