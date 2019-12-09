@@ -9,5 +9,6 @@ public interface TsoftService {
     GenericResponse updateToSupplement(String token, String orderCode);
     GenericResponse finishOrder(String token, String orderCode);
     GenericResponse cancelOrder(String token, String orderCode);
+    GenericResponse createInvoice(String orderCode);
 
 }

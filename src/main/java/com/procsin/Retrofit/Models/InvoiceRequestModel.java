@@ -12,6 +12,7 @@ public class InvoiceRequestModel {
     public String InvoiceDate;
     public boolean IsCompleted;
     public boolean SendInvoiceByEMail;
+    public String EMailAddress;
     public List<OrderLineModel> OrderLineIDs;
     public List<PaymentRequestModel> Payments;
 
@@ -26,13 +27,18 @@ public class InvoiceRequestModel {
         Payments = payments;
     }
 
-    public InvoiceRequestModel(List<OrderDetailsModel> models) {
+    public InvoiceRequestModel(List<OrderDetailsModel> models, boolean isTrendyol) {
         if (models != null && models.size() > 0) {
             ModelType = 0;
             OrderHeaderID = models.get(0).OrderHeaderID;
             InvoiceDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
             IsCompleted = true;
             SendInvoiceByEMail = true;
+
+            if (isTrendyol) {
+                EMailAddress = "trendyol-customer@procsin.com";
+            }
+
             OrderLineIDs = new ArrayList<>();
             for (OrderDetailsModel model : models) {
                 OrderLineIDs.add(new OrderLineModel(model.orderline));

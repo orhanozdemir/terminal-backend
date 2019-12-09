@@ -1,5 +1,6 @@
 package com.procsin.API.Service.Implementation.Pack;
 
+import com.procsin.API.DAO.CampaignLogDao;
 import com.procsin.API.DAO.ErrorLogDao;
 import com.procsin.API.DAO.Pack.CampaignDao;
 import com.procsin.API.DAO.Pack.OrderDao;
@@ -13,6 +14,7 @@ import com.procsin.API.Service.Interface.Pack.OrderService;
 import com.procsin.API.Service.Interface.Pack.TsoftService;
 import com.procsin.DB.Entity.ErrorLog;
 import com.procsin.DB.Entity.Pack.Campaign;
+import com.procsin.DB.Entity.Pack.CampaignLog;
 import com.procsin.DB.Entity.Pack.OrderLog;
 import com.procsin.DB.Entity.Pack.Orders;
 import com.procsin.DB.Entity.UserManagement.User;
@@ -20,6 +22,7 @@ import com.procsin.Retrofit.Interfaces.TsoftInterface;
 import com.procsin.Retrofit.Models.InvoiceResponseModel;
 import com.procsin.Retrofit.Models.TSoft.OrderDataModel;
 import com.procsin.Retrofit.Models.TSoft.OrderModel;
+import com.procsin.Retrofit.Models.TSoft.ProductModel;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -70,6 +73,8 @@ public class TsoftServiceImpl implements TsoftService {
     ErrorLogDao errorLogRepository;
     @Autowired
     CampaignDao campaignRepository;
+    @Autowired
+    CampaignLogDao campaignLogRepository;
     @Autowired
     UserDao userRepository;
 
@@ -197,6 +202,12 @@ public class TsoftServiceImpl implements TsoftService {
         throw new IllegalStateException(errorMessage);
     }
 
+    @Override
+    public GenericResponse createInvoice(String orderCode) {
+        InvoiceResponseModel invoiceModel = iisService.createInvoice(orderCode);
+        return new GenericResponse(true,"Başarılı");
+    }
+
     private OrderLogSuccessModel prepareOrder(String token, OrderModel orderModel) {
         Orders order = orderRepository.findByOrderCode(orderModel.OrderCode);
         if (order == null) {
@@ -227,7 +238,49 @@ public class TsoftServiceImpl implements TsoftService {
         try {
             OrderLog packLog = new OrderLog(order,OrderLog.OrderStatus.URUN_PAKETLENIYOR,getActiveUser());
             orderLogRepository.save(packLog);
+
             Campaign campaign = campaignRepository.findSuitableCampaign(order.getTotalCost());
+
+            if (campaign != null) {
+                boolean shouldShow = false;
+
+                if (campaign.isIosAvailable() && orderModel.Application.equals("ios")) {
+                    shouldShow = true;
+                }
+                else if (campaign.isAndroidAvailable() && orderModel.Application.equals("android")) {
+                    shouldShow = true;
+                }
+                else if (campaign.isWebAvailable() && (orderModel.Application.equals("") || orderModel.Application.equals("mobile_site"))) {
+                    shouldShow = true;
+                }
+
+                if (campaign.getCampaignType().equals("BASKET")) {
+                    if (shouldShow) {
+                        ProductModel model = new ProductModel();
+                        model.Barcode = campaign.getProductBarcode();
+                        model.ProductCode = campaign.getProductCode();
+                        model.ProductName = campaign.getProductName();
+                        model.Quantity = 1;
+                        model.count = 1;
+                        model.setTotalCount(1);
+                        model.IsPackage = "0";
+                        orderModel.OrderDetails.add(model);
+                        CampaignLog campaignLog = new CampaignLog(campaign,new Date(),orderModel.OrderCode);
+                        campaignLogRepository.save(campaignLog);
+                    }
+                    campaign = null;
+                }
+                else {
+                    if (shouldShow) {
+                        CampaignLog campaignLog = new CampaignLog(campaign,new Date(),orderModel.OrderCode);
+                        campaignLogRepository.save(campaignLog);
+                    }
+                    else {
+                        campaign = null;
+                    }
+                }
+            }
+
             GenericTsoftResponseModel response = repo.updateOrderStatusToPack(token,updateOrderDataString(orderModel.OrderCode)).execute().body();
             if (response != null && response.success) {
                 return new OrderLogSuccessModel(true,"Başarılı",campaign,orderModel);

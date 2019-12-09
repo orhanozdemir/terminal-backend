@@ -25,9 +25,14 @@ public class Orders {
     private String invoiceCode;
     private String invoiceRefNumber;
 
+    private String deliveryAddress;
+    private String deliveryBarcode;
+
+    private boolean isPrinted;
+
     public Orders() {}
 
-    public Orders(String orderCode, String deliveryName, double totalCost, int totalProductCount, Date orderDate, Boolean didFail, String invoiceCode, String invoiceRefNumber) {
+    public Orders(String orderCode, String deliveryName, double totalCost, int totalProductCount, Date orderDate, Boolean didFail, String invoiceCode, String invoiceRefNumber, String deliveryAddress, String deliveryBarcode) {
         this.orderCode = orderCode;
         this.deliveryName = deliveryName;
         this.totalCost = totalCost;
@@ -36,6 +41,8 @@ public class Orders {
         this.didFail = didFail;
         this.invoiceCode = invoiceCode;
         this.invoiceRefNumber = invoiceRefNumber;
+        this.deliveryAddress = deliveryAddress;
+        this.deliveryBarcode = deliveryBarcode;
     }
 
     public Orders(OrderResponseModel model) {
@@ -123,5 +130,29 @@ public class Orders {
 
     public void setInvoiceRefNumber(String invoiceRefNumber) {
         this.invoiceRefNumber = invoiceRefNumber;
+    }
+
+    public String getDeliveryAddress() {
+        return deliveryAddress;
+    }
+
+    public void setDeliveryAddress(String deliveryAddress) {
+        this.deliveryAddress = deliveryAddress;
+    }
+
+    public String getDeliveryBarcode() {
+        return deliveryBarcode;
+    }
+
+    public void setDeliveryBarcode(String deliveryBarcode) {
+        this.deliveryBarcode = deliveryBarcode;
+    }
+
+    public boolean isPrinted() {
+        return isPrinted;
+    }
+
+    public void setPrinted(boolean printed) {
+        isPrinted = printed;
     }
 }

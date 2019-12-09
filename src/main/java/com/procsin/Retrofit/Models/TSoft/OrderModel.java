@@ -11,6 +11,9 @@ public class OrderModel {
     public String DeliveryAddress;
     public Date OrderDate;
     public double OrderTotalPrice;
+
+    public String Application;
+
     public List<ProductModel> OrderDetails;
 
     @Expose

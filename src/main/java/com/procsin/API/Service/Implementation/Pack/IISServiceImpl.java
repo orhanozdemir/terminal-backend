@@ -37,7 +37,9 @@ public class IISServiceImpl implements IISService {
 
         updateWarehouseCode(orderCode);
         List<OrderDetailsModel> orderDetails = getOrderDetails(orderCode);
-        InvoiceRequestModel requestModel = createRequestModel(orderDetails);
+
+        boolean isTrendyol = orderCode.contains("TY");
+        InvoiceRequestModel requestModel = createRequestModel(orderDetails, isTrendyol);
         try {
             Response<AuthResponseModel> authResponse = repo.auth().execute();
             Response<InvoiceResponseModel> invoiceResponse = repo.invoice("(S(" + authResponse.body().SessionID + "))",requestModel).execute();
@@ -57,6 +59,41 @@ public class IISServiceImpl implements IISService {
         return result;
     }
 
+//    @Transactional
+//    Integer checkValidation(String accCode) {
+//        List<RetailCustomerModel> customerModels = em.createNativeQuery(Queries.GET_RETAIL_CUSTOMER,RetailCustomerModel.class)
+//                .setParameter("AccCode",accCode).getResultList();
+//        RetailCustomerModel model = customerModels.get(0);
+//
+//        if(isNameValid(model.FirstName)) {
+//
+//        }
+//        if(isNameValid(model.LastName)) {
+//
+//        }
+//        if(isEmailValid(model.CommAddress)) {
+//
+//        }
+//        if(isIdentityValid(model.IdentityNum)) {
+//            model.IdentityNum = "11111111111";
+//        }
+//
+//    }
+
+    boolean isNameValid(String name) {
+
+
+        return true;
+    }
+
+    boolean isEmailValid(String email) {
+        return true;
+    }
+
+    boolean isIdentityValid(String identity) {
+        return identity.length() == 11;
+    }
+
     List<OrderDetailsModel> getOrderDetails(String orderCode) {
         StoredProcedureQuery query = em.createStoredProcedureQuery("PROCSIN_V3.dbo.usp_Getsiparis",OrderDetailsModel.class);
         query.registerStoredProcedureParameter(1, String.class, ParameterMode.IN);
@@ -64,8 +101,8 @@ public class IISServiceImpl implements IISService {
         return query.getResultList();
     }
 
-    InvoiceRequestModel createRequestModel(List<OrderDetailsModel> models) {
-        return new InvoiceRequestModel(models);
+    InvoiceRequestModel createRequestModel(List<OrderDetailsModel> models, boolean isTrendyol) {
+        return new InvoiceRequestModel(models, isTrendyol);
     }
 
 }

@@ -46,4 +46,11 @@ public class Queries {
 
     public static String GET_INVOICE_DETAILS = "SELECT TOP 1 NEWID() as id, InternalDescription, InvoiceNumber, EInvoiceNumber FROM PROCSIN_V3.dbo.AllInvoices WHERE InternalDescription = :InternalDescription";
 
+    public static String GET_RETAIL_CUSTOMER = "SELECT NEWID() as id, FirstName, LastName, IdentityNum, CommAddress FROM PROCSIN_V3.dbo.cdCurrAcc\n" +
+            "LEFT JOIN PROCSIN_V3.dbo.prCurrAccCommunication ON cdCurrAcc.CurrAccCode = prCurrAccCommunication.CurrAccCode AND CommunicationTypeCode = 3\n" +
+            "WHERE cdCurrAcc.CurrAccCode = :AccCode";
+
+    public static String GET_NON_PRINTED_ORDERS = "SELECT TOP (20) NEWID() as id, orderCode, deliveryName as fullName, NULL as invoiceURL FROM PRS_SEVK.sevk.Orders o, PRS_SEVK.sevk.OrderLog l\n" +
+            "WHERE isPrinted = 0 AND o.id = l.order_id AND l.status = 1";
+
 }

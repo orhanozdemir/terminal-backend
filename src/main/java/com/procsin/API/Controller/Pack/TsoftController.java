@@ -33,4 +33,8 @@ public class TsoftController {
         return tsoftService.cancelOrder(token, orderCode);
     }
 
+    @RequestMapping(value = "/create-invoice", method = RequestMethod.POST)
+    GenericResponse createInvoice(@RequestParam String orderCode) {
+        return tsoftService.createInvoice(orderCode);
+    }
 }
