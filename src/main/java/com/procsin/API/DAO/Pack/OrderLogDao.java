@@ -28,6 +28,9 @@ public interface OrderLogDao extends CrudRepository<OrderLog,Long> {
 
     List<OrderLog> findAllByOrder(Orders order);
 
+    @Query(value = "SELECT OrderLog.* FROM PRS_SEVK.sevk.OrderLog LEFT JOIN PRS_SEVK.sevk.Orders ON OrderLog.order_id = Orders.id WHERE orderCode = :orderCode", nativeQuery = true)
+    List<OrderLog> findAllByOrderCode(@Param("orderCode") String orderCode);
+
     @Query(value = "SELECT * FROM PRS_SEVK.sevk.OrderLog WHERE order_id = :orderId ORDER BY date DESC", nativeQuery = true)
     List<OrderLog> getOrderLogs(@Param("orderId") Long orderId);
 
@@ -41,4 +44,6 @@ public interface OrderLogDao extends CrudRepository<OrderLog,Long> {
     @Query(value = "SELECT a.* FROM PRS_SEVK.sevk.OrderLog a, PRS_SEVK.sevk.Orders b WHERE a.order_id = b.id AND b.orderCode = :orderCode", nativeQuery = true)
     List<OrderLog> getOrderDetails(@Param("orderCode") String orderCode);
 
+    @Query(value = "UPDATE PRS_SEVK.sevk.Orders SET status = :status WHERE orderCode = :orderCode", nativeQuery = true)
+    void updateOrderStatus(@Param("status") String status, @Param("orderCode") String orderCode);
 }

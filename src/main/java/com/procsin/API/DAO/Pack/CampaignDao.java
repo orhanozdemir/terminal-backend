@@ -9,7 +9,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CampaignDao extends CrudRepository<Campaign, Long> {
 
-    @Query(value = "SELECT TOP 1 * FROM PRS_SEVK.sevk.Campaign WHERE costThreshold = (SELECT MAX(costThreshold) FROM PRS_SEVK.sevk.Campaign WHERE isActive = 1 AND costThreshold <= :cost) AND isActive = 1 AND costThreshold <= :cost", nativeQuery = true)
-    Campaign findSuitableCampaign(@Param("cost") double cost);
+    @Query(value = "SELECT TOP 1 * FROM PRS_SEVK.sevk.Campaign\n" +
+            "WHERE costThreshold = (SELECT MAX(costThreshold) FROM PRS_SEVK.sevk.Campaign WHERE isActive = 1 AND costThreshold <= :cost) AND isActive = 1 AND costThreshold <= :cost\n" +
+            "AND startDate <= :orderDate AND endDate >= :orderDate", nativeQuery = true)
+    Campaign findSuitableCampaign(@Param("cost") double cost, @Param("orderDate") String orderDate);
 
 }

@@ -29,6 +29,9 @@ public class Campaign {
 
     private boolean isActive;
 
+    private Date startDate;
+    private Date endDate;
+
     private Date createdAt;
 
     public Campaign() {}
@@ -126,6 +129,22 @@ public class Campaign {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 
     public Date getCreatedAt() {

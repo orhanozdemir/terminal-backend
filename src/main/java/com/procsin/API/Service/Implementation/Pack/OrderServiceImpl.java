@@ -1,17 +1,14 @@
 package com.procsin.API.Service.Implementation.Pack;
 
 import com.procsin.API.DAO.ErrorLogDao;
-import com.procsin.API.DAO.Pack.CampaignDao;
 import com.procsin.API.DAO.Pack.OrderDao;
 import com.procsin.API.DAO.Pack.OrderLogDao;
 import com.procsin.API.DAO.UserDao;
 import com.procsin.API.Model.GenericResponse;
 import com.procsin.API.Model.OrderLogSuccessModel;
-import com.procsin.API.Model.TSOFT.OrderResponseModel;
-import com.procsin.API.Service.Interface.Pack.IISService;
-import com.procsin.API.Service.Interface.Pack.OrderService;
+import com.procsin.API.Model.TSOFT.GenericTsoftResponseModel;
+import com.procsin.API.Service.Interface.Pack.*;
 import com.procsin.DB.Entity.ErrorLog;
-import com.procsin.DB.Entity.Pack.Campaign;
 import com.procsin.DB.Entity.Pack.OrderLog;
 import com.procsin.DB.Entity.Pack.Orders;
 import com.procsin.DB.Entity.UserManagement.User;
@@ -20,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -27,200 +25,224 @@ import java.util.List;
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
-    private OrderDao orderRepository;
+    private UserDao userDao;
+    @Autowired
+    private ErrorLogDao errorLogDao;
+    @Autowired
+    private OrderDao orderDao;
+    @Autowired
+    private OrderLogDao orderLogDao;
 
     @Autowired
-    private OrderLogDao orderLogRepository;
-
+    TrendyolService trendyolService;
     @Autowired
-    private CampaignDao campaignRepository;
-
+    TsoftService tsoftService;
     @Autowired
-    private UserDao userRepository;
-
+    OrderLogService orderLogService;
     @Autowired
-    private IISService iisService;
-
-    @Autowired
-    private ErrorLogDao errorLogRepository;
+    IISService iisService;
 
     private User getActiveUser() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return userRepository.findByUsername(userDetails.getUsername());
+        return userDao.findByUsername(userDetails.getUsername());
     }
 
     private void createErrorLog(String errorCode, String errorMessage) {
         ErrorLog errorLog = new ErrorLog(errorCode,errorMessage,getActiveUser().getId());
-        errorLogRepository.save(errorLog);
+        errorLogDao.save(errorLog);
+    }
+
+    @Override
+    public OrderLogSuccessModel getSingleOrder(String token, boolean isTrendyol) {
+        try {
+            if (isTrendyol) {
+                return trendyolService.getOrder();
+            }
+            else {
+                return tsoftService.getTSoftOrder(token);
+            }
+
+        } catch (IOException e) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    @Override
+    public GenericResponse finishOrder(String token, String orderCode) {
+        boolean isTrendyol = orderCode.startsWith("TY");
+        if (isPackedBefore(orderCode)) {
+            String errorMessage = "Bu sipariş daha önce tamamlanmış";
+            createErrorLog("Order-1007",errorMessage + " / " + orderCode);
+            throw new IllegalStateException(errorMessage);
+        }
+        else {
+            Orders order = orderDao.findByOrderCode(orderCode);
+            if (order == null) {
+                String errorMessage = "Bu sipariş hiç oluşturulmamış";
+                createErrorLog("Order-1008",errorMessage + " / " + orderCode);
+                throw new IllegalStateException(errorMessage);
+            }
+            try {
+                if (!isTrendyol) {
+                    GenericTsoftResponseModel response = tsoftService.updateOrderStatus(token,orderCode, Orders.OrderStatusEnum.PACKED);
+                    if (response == null || !response.success) {
+                        String errorMessage = "Sipariş tamamlanırken bir sorun oluştu.";
+                        createErrorLog("Order-1009",errorMessage + " / " + orderCode);
+                        throw new IllegalStateException(errorMessage);
+                    }
+                }
+
+                orderLogService.createOrderLog(order,OrderLog.OrderStatus.KARGO_HAZIR);
+                iisService.createInvoice(orderCode);
+
+                return new GenericResponse(true,"Başarılı");
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        String errorMessage = "Sipariş tamamlanırken bir sorun oluştu.";
+        createErrorLog("Order-1009",errorMessage + " / " + orderCode);
+        throw new IllegalStateException(errorMessage);
+    }
+
+    @Override
+    public GenericResponse updateToSupplement(String token, String orderCode) {
+        boolean isTrendyol = orderCode.startsWith("TY");
+        Orders order = orderDao.findByOrderCode(orderCode);
+        if (order == null) {
+            String errorCode = "Order-1003";
+            String errorMessage = errorCode + "/" + "Bu sipariş hiç oluşturulmamış";
+            createErrorLog(errorCode,errorMessage + " / " + orderCode);
+            throw new IllegalStateException(errorMessage);
+        }
+        if (isPackedBefore(orderCode)) {
+            String errorCode = "Order-1004";
+            String errorMessage = errorCode + "/" + "Bu sipariş daha önce tamamlanmış";
+            createErrorLog(errorCode,errorMessage + " / " + orderCode);
+            throw new IllegalStateException(errorMessage);
+        }
+        try {
+            if (!isTrendyol) {
+                GenericTsoftResponseModel response = tsoftService.updateOrderStatus(token, orderCode, Orders.OrderStatusEnum.NEED_SUPPLY);
+                if (response == null || !response.success) {
+                    throw new IllegalStateException("-");
+                }
+            }
+//            orderLogService.updateOrderStatus(order.getOrderCode(),Orders.OrderStatusEnum.NEED_SUPPLY);
+            orderLogService.createOrderLog(order,OrderLog.OrderStatus.TEDARIK_SURECINDE);
+            return new GenericResponse(true,"Başarılı");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return new GenericResponse(false,"Hata");
+    }
+
+    @Override
+    public GenericResponse cancelOrder(String token, String orderCode) {
+        boolean isTrendyol = orderCode.startsWith("TY");
+        Orders order = orderDao.findByOrderCode(orderCode);
+        if (order == null) {
+            String errorCode = "Order-1005";
+            String errorMessage = errorCode + "/" + "Bu sipariş hiç oluşturulmamış";
+            createErrorLog(errorCode,errorMessage + " / " + orderCode);
+            throw new IllegalStateException(errorMessage);
+        }
+        if (isPackedBefore(orderCode)) {
+            String errorCode = "Order-1006";
+            String errorMessage = errorCode + "/" + "Bu sipariş daha önce tamamlanmış";
+            createErrorLog(errorCode,errorMessage + " / " + orderCode);
+            throw new IllegalStateException(errorMessage);
+        }
+        try {
+            if (!isTrendyol) {
+                GenericTsoftResponseModel response = tsoftService.updateOrderStatus(token, orderCode, Orders.OrderStatusEnum.CANCELED);
+                if (response == null || !response.success) {
+                    String errorCode = "Order-1010";
+                    String errorMessage = errorCode + "/" + "sipariş iptal edilirken sorun oluştu.";
+                    createErrorLog(errorCode,errorMessage + " / " + orderCode);
+                    throw new IllegalStateException(errorMessage);
+                }
+            }
+//            orderLogService.updateOrderStatus(order.getOrderCode(),Orders.OrderStatusEnum.CANCELED);
+            orderLogService.createOrderLog(order,OrderLog.OrderStatus.URUN_PAKETLENIYOR_IPTAL);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String errorCode = "Order-1010";
+        String errorMessage = errorCode + "/" + "sipariş iptal edilirken sorun oluştu.";
+        createErrorLog(errorCode,errorMessage + " / " + orderCode);
+        throw new IllegalStateException(errorMessage);
     }
 
 //    @Override
-//    public OrderLogSuccessModel prepareOrder(OrderResponseModel orderModel) {
-//        Orders order = orderRepository.findByOrderCode(orderModel.OrderCode);
-//        if (order == null) {
-//            order = new Orders(orderModel);
-//            orderRepository.save(order);
-//        }
-//
-//        List<OrderLog> logs = orderLogRepository.findAllByOrder(order);
-//        if (logs != null && logs.size() > 0) {
-//            OrderLog lastLog = logs.get(logs.size() - 1);
-//            if (lastLog != null) {
-//                if (lastLog.getStatus() == OrderLog.OrderStatus.KARGO_HAZIR) {
-//                    String errorCode = "Order-1001";
-//                    String errorMessage = errorCode + "/" + "Bu sipariş daha önce tamamlanmış";
-//                    createErrorLog(errorCode,errorMessage + " / " + order.getOrderCode());
-//                    throw new IllegalStateException(errorMessage);
-//                }
-//                if (lastLog.getStatus() == OrderLog.OrderStatus.URUN_PAKETLENIYOR) {
-//                    String errorCode = "Order-1002";
-//                    String errorMessage = errorCode + "/" + "Bu sipariş daha önce işleme alınmış";
-//                    createErrorLog(errorCode,errorMessage + " / " + order.getOrderCode());
-//                    throw new IllegalStateException(errorMessage);
-//                }
-//            }
-//        }
-//        OrderLog packLog = new OrderLog(order,OrderLog.OrderStatus.URUN_PAKETLENIYOR,getActiveUser());
-//        orderLogRepository.save(packLog);
-//
-//        Campaign campaign = campaignRepository.findSuitableCampaign(order.getTotalCost());
-//
-////        order.addLogToList(packLog);
-////        orderRepository.save(order);
-//        return new OrderLogSuccessModel(true,"Başarılı",campaign);
-//    }
-//
-//    @Override
-//    public GenericResponse updateToSupplement(OrderResponseModel orderModel) {
-//        Orders order = orderRepository.findByOrderCode(orderModel.OrderCode);
-//        if (order == null) {
-//            String errorCode = "Order-1003";
-//            String errorMessage = errorCode + "/" + "Bu sipariş hiç oluşturulmamış";
-//            createErrorLog(errorCode,errorMessage + " / " + orderModel.OrderCode);
-//            throw new IllegalStateException(errorMessage);
-//        }
-//        if (isPackedBefore(orderModel.OrderCode)) {
-//            String errorCode = "Order-1004";
-//            String errorMessage = errorCode + "/" + "Bu sipariş daha önce tamamlanmış";
-//            createErrorLog(errorCode,errorMessage + " / " + orderModel.OrderCode);
-//            throw new IllegalStateException(errorMessage);
-//        }
-//
-//        OrderLog suppLog = new OrderLog(order, OrderLog.OrderStatus.TEDARIK_SURECINDE, getActiveUser());
-//        orderLogRepository.save(suppLog);
-////        order.addLogToList(suppLog);
-//        return new GenericResponse(true,"Başarılı");
+//    public GenericResponse createInvoice(String orderCode) {
+//        iisService.createInvoice(orderCode);
+////        updateOrderInvoiceInfo(orderCode, invoiceModel);
+////        return new GenericResponse(true,"Başarılı");
 //    }
 
-//    @Override
-//    public GenericResponse updateToPackCancel(String orderCode) {
-//        Orders order = orderRepository.findByOrderCode(orderCode);
-//        if (order == null) {
-//            String errorCode = "Order-1005";
-//            String errorMessage = errorCode + "/" + "Bu sipariş hiç oluşturulmamış";
-//            createErrorLog(errorCode,errorMessage + " / " + orderCode);
-//            throw new IllegalStateException(errorMessage);
-//        }
-//        if (isPackedBefore(orderCode)) {
-//            String errorCode = "Order-1006";
-//            String errorMessage = errorCode + "/" + "Bu sipariş daha önce tamamlanmış";
-//            createErrorLog(errorCode,errorMessage + " / " + orderCode);
-//            throw new IllegalStateException(errorMessage);
-//        }
-//
-//        OrderLog cancelLog = new OrderLog(order, OrderLog.OrderStatus.URUN_PAKETLENIYOR_IPTAL, getActiveUser());
-//        orderLogRepository.save(cancelLog);
-////        order.addLogToList(cancelLog);
-////        orderRepository.save(order);
-//        return new GenericResponse(true,"Başarılı");
-//    }
+    @Override
+    public boolean isOrderAvailable(String orderCode) {
+        List<OrderLog> logs = orderLogDao.findAllByOrderCode(orderCode);
+        if (logs != null && logs.size() > 0) {
+            OrderLog lastLog = logs.get(logs.size() - 1);
+            if (lastLog != null) {
+                if (lastLog.getStatus() == OrderLog.OrderStatus.KARGO_HAZIR) {
+                    String errorCode = "Order-1001";
+                    String errorMessage = errorCode + "/" + "Bu sipariş daha önce tamamlanmış";
+                    createErrorLog(errorCode,errorMessage + " / " + orderCode);
+                    return false;
+                }
+                if (lastLog.getStatus() == OrderLog.OrderStatus.URUN_PAKETLENIYOR) {
+                    String errorCode = "Order-1002";
+                    String errorMessage = errorCode + "/" + "Bu sipariş daha önce işleme alınmış";
+                    createErrorLog(errorCode,errorMessage + " / " + orderCode);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
-//    @Override
-//    public GenericResponse finishOrder(OrderResponseModel orderModel) {
-//        if (isPackedBefore(orderModel.OrderCode)) {
-//            String errorMessage = "Bu sipariş daha önce tamamlanmış";
-//            createErrorLog("Order-1007",errorMessage + " / " + orderModel.OrderCode);
-//            throw new IllegalStateException(errorMessage);
-//        }
-//        else {
-//            Orders order = orderRepository.findByOrderCode(orderModel.OrderCode);
-//            if (order == null) {
-//                String errorMessage = "Bu sipariş hiç oluşturulmamış";
-//                createErrorLog("Order-1008",errorMessage + " / " + orderModel.OrderCode);
-//                throw new IllegalStateException(errorMessage);
-//            }
-//            OrderLog finishLog = new OrderLog(order, OrderLog.OrderStatus.KARGO_HAZIR, getActiveUser());
-//            orderLogRepository.save(finishLog);
-//
-//            InvoiceResponseModel invoiceModel = iisService.createInvoice(orderModel.OrderCode);
-//            updateOrderInvoiceInfo(orderModel.OrderCode, invoiceModel);
-//            return new GenericResponse(true,"Başarılı");
-//        }
-//    }
+    public boolean isPackedBefore(String orderCode) {
+        return orderLogDao.findReadyByOrderCode(orderCode) != null;
+    }
 
-//    @Override
-//    public Boolean isPackedBefore(String orderCode) {
-//        return orderLogRepository.findReadyByOrderCode(orderCode) != null;
-//    }
-
-//    @Override
-//    public Orders updateOrderInvoiceInfo(String orderCode, InvoiceResponseModel responseModel) {
-//        Orders orderModel = orderRepository.findByOrderCode(orderCode);
+//    private Orders updateOrderInvoiceInfo(String orderCode, InvoiceResponseModel responseModel) {
+//        Orders orderModel = orderDao.findByOrderCode(orderCode);
 //        orderCode = " / " + orderCode;
 //        ErrorLog errorLog = new ErrorLog();
 //        errorLog.setDate(new Date());
 //        errorLog.setUserId(getActiveUser().getId());
 //        if (responseModel != null) {
 //            if (orderModel != null) {
-//                if (!responseModel.ExceptionMessage.isEmpty()) {
+//                if (responseModel.ExceptionMessage != null && !responseModel.ExceptionMessage.isEmpty()) {
 //                    errorLog.setErrorCode("Invoice-1001");
 //                    errorLog.setErrorMessage(responseModel.ExceptionMessage + orderCode);
-//                    errorLogRepository.save(errorLog);
+//                    errorLogDao.save(errorLog);
 //                } else {
-//                    if (responseModel.EInvoiceNumber.isEmpty()) {
+//                    if (responseModel.EInvoiceNumber != null && (responseModel.EInvoiceNumber.isEmpty() || responseModel.EInvoiceNumber.equals("None"))) {
 //                        errorLog.setErrorCode("Invoice-1002");
 //                        errorLog.setErrorMessage("Faturası oluşturuldu, e-faturası oluşturulamadı." + orderCode);
-//                        errorLogRepository.save(errorLog);
+//                        errorLogDao.save(errorLog);
 //                    }
 //                }
 //                orderModel.setInvoiceRefNumber(responseModel.InvoiceNumber);
 //                orderModel.setInvoiceCode(responseModel.EInvoiceNumber);
-//                return orderRepository.save(orderModel);
+//                return orderDao.save(orderModel);
 //            }
 //            errorLog.setErrorCode("Invoice-1004");
 //            errorLog.setErrorMessage("Fatura oluşturuldu, ilgili sipariş bulunamadığı için kendi tablomuza kaydedilemedi." + orderCode);
-//            errorLogRepository.save(errorLog);
+//            errorLogDao.save(errorLog);
 //        }
 //        else {
 //            errorLog.setErrorCode("Invoice-1003");
 //            errorLog.setErrorMessage("Fatura servisi hata verdi." + orderCode);
-//            errorLogRepository.save(errorLog);
+//            errorLogDao.save(errorLog);
 //        }
 //        return null;
-//    }
-
-//    @Override
-//    public InvoiceResponseModel createInvoiceFromOrderCode(String orderCode) {
-//        InvoiceResponseModel response = iisService.createInvoice(orderCode);
-//        updateOrderInvoiceInfo(orderCode,response);
-//        return response;
-//    }
-
-//    @Override
-//    public Orders findByOrderCode(String orderCode) {
-//        return orderRepository.findByOrderCode(orderCode);
-//    }
-//
-//    @Override
-//    public List<Orders> findLikeOrderCode(String orderCode) {
-//        return orderRepository.findLikeOrderCode(orderCode);
-//    }
-//
-//    @Override
-//    public Orders changeFailedStatus(Boolean didFail, String orderCode) {
-//        Orders order = findByOrderCode(orderCode);
-//        order.setDidFail(didFail);
-//        return orderRepository.save(order);
 //    }
 
 }

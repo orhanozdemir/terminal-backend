@@ -1,14 +1,13 @@
 package com.procsin.API.Service.Interface.Pack;
 
-import com.procsin.API.Model.GenericResponse;
 import com.procsin.API.Model.OrderLogSuccessModel;
+import com.procsin.API.Model.TSOFT.GenericTsoftResponseModel;
+import com.procsin.DB.Entity.Pack.Orders;
+import java.io.IOException;
 
 public interface TsoftService {
 
-    OrderLogSuccessModel getSingleOrder(String token, boolean isTrendyol);
-    GenericResponse updateToSupplement(String token, String orderCode);
-    GenericResponse finishOrder(String token, String orderCode);
-    GenericResponse cancelOrder(String token, String orderCode);
-    GenericResponse createInvoice(String orderCode);
+    OrderLogSuccessModel getTSoftOrder(String token) throws IOException;
+    GenericTsoftResponseModel updateOrderStatus(String token, String orderCode, Orders.OrderStatusEnum status) throws IOException;
 
 }

@@ -8,6 +8,8 @@ import com.procsin.Retrofit.Models.InvoiceResponseModel;
 import com.procsin.Retrofit.Models.OrderDetailsModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -26,10 +28,10 @@ public class IISServiceImpl implements IISService {
     EntityManager em;
 
     @Override
-    public InvoiceResponseModel createInvoice(String orderCode) {
+    public void createInvoice(String orderCode) {
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://172.17.5.196:1515")
+                .baseUrl("http://176.236.208.115:1515")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -42,11 +44,21 @@ public class IISServiceImpl implements IISService {
         InvoiceRequestModel requestModel = createRequestModel(orderDetails, isTrendyol);
         try {
             Response<AuthResponseModel> authResponse = repo.auth().execute();
-            Response<InvoiceResponseModel> invoiceResponse = repo.invoice("(S(" + authResponse.body().SessionID + "))",requestModel).execute();
-            return invoiceResponse.body();
+            repo.invoice("(S(" + authResponse.body().SessionID + "))",requestModel).enqueue(new Callback<InvoiceResponseModel>() {
+                @Override
+                public void onResponse(Call<InvoiceResponseModel> call, Response<InvoiceResponseModel> response) {
+
+                }
+
+                @Override
+                public void onFailure(Call<InvoiceResponseModel> call, Throwable throwable) {
+
+                }
+            });
+//            return invoiceResponse.body();
         } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+//            e.printStackTrace();
+//            return null;
         }
     }
 
@@ -59,30 +71,7 @@ public class IISServiceImpl implements IISService {
         return result;
     }
 
-//    @Transactional
-//    Integer checkValidation(String accCode) {
-//        List<RetailCustomerModel> customerModels = em.createNativeQuery(Queries.GET_RETAIL_CUSTOMER,RetailCustomerModel.class)
-//                .setParameter("AccCode",accCode).getResultList();
-//        RetailCustomerModel model = customerModels.get(0);
-//
-//        if(isNameValid(model.FirstName)) {
-//
-//        }
-//        if(isNameValid(model.LastName)) {
-//
-//        }
-//        if(isEmailValid(model.CommAddress)) {
-//
-//        }
-//        if(isIdentityValid(model.IdentityNum)) {
-//            model.IdentityNum = "11111111111";
-//        }
-//
-//    }
-
     boolean isNameValid(String name) {
-
-
         return true;
     }
 
