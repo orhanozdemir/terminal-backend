@@ -31,6 +31,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import javax.persistence.EntityManager;
@@ -113,8 +116,18 @@ public class TsoftServiceImpl implements TsoftService {
     }
 
     @Override
-    public GenericTsoftResponseModel updateOrderStatus(String token, String orderCode, Orders.OrderStatusEnum status) throws IOException {
+    public OrderModel getSingleOrder(String token, String orderCode) throws IOException {
+        OrderDataModel response = repo.getSingleOrder(token,true,orderCode).execute().body();
+        if (response != null) {
+            if (response.data != null && response.data.size() > 0) {
+                return response.data.get(0);
+            }
+        }
+        throw new IllegalArgumentException();
+    }
 
+    @Override
+    public GenericTsoftResponseModel updateOrderStatus(String token, String orderCode, Orders.OrderStatusEnum status) throws IOException {
         switch (status) {
             case CANCELED:
                 return repo.updateOrderStatusToPreparing(token, updateOrderDataString(orderCode)).execute().body();

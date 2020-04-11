@@ -17,5 +17,4 @@ public interface ReportService {
     FailStatsResponseModel getFailStats(String fromDate, String toDate);
 
     void setOrderDates();
-    void setOrderInvoices();
 }

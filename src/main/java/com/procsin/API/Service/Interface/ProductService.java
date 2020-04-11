@@ -1,10 +1,11 @@
 package com.procsin.API.Service.Interface;
 
-import com.procsin.DB.Entity.Product;
+import com.procsin.API.Model.ItemBarcodeResponseModel;
+
 import java.util.List;
 
 public interface ProductService {
 
-    List<Product> getProductList();
+    List<ItemBarcodeResponseModel> getItemBarcodeList();
 
 }

@@ -4,6 +4,7 @@ import com.procsin.API.Model.GenericResponse;
 import com.procsin.API.Model.OrderLogSuccessModel;
 import com.procsin.API.Service.Interface.Pack.OrderService;
 import com.procsin.API.Service.Interface.Pack.TsoftService;
+import com.procsin.Retrofit.Models.TSoft.OrderModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,6 +25,12 @@ public class TsoftController {
     OrderLogSuccessModel getOrder(@RequestParam String token, @RequestParam boolean isTrendyol) {
         return orderService.getSingleOrder(token, isTrendyol);
     }
+
+    @RequestMapping(value = "/getOrder", method = RequestMethod.GET)
+    OrderModel getOrder(@RequestParam String token, @RequestParam String orderCode) {
+        return orderService.getSpecificOrder(token,orderCode);
+    }
+
     @RequestMapping(value = "/updateSupplement", method = RequestMethod.POST)
     GenericResponse updateToSupplement(@RequestParam String token, @RequestParam String orderCode) {
         return orderService.updateToSupplement(token, orderCode);
@@ -36,9 +43,4 @@ public class TsoftController {
     GenericResponse cancelOrder(@RequestParam String token, @RequestParam String orderCode) {
         return orderService.cancelOrder(token, orderCode);
     }
-
-//    @RequestMapping(value = "/create-invoice", method = RequestMethod.POST)
-//    GenericResponse createInvoice(@RequestParam String orderCode) {
-//        return orderService.createInvoice(orderCode);
-//    }
 }

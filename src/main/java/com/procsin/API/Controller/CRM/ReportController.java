@@ -29,10 +29,6 @@ public class ReportController {
     @Autowired
     EntityManager em;
 
-//    @RequestMapping(value = "/orders", method = RequestMethod.GET)
-//    List<Orders> getOrders(@RequestParam String fromDate, @RequestParam String toDate) {
-//        return reportService.getOrders(fromDate,toDate);
-//    }
     @RequestMapping(value = "/orders", method = RequestMethod.GET)
     List<Orders> getOrders(@RequestParam(value = "fromDate", required = false) String fromDate, @RequestParam(value = "toDate", required = false) String toDate) {
         return reportService.getOrders(fromDate,toDate);
@@ -59,11 +55,6 @@ public class ReportController {
     @RequestMapping(value = "/setOrderDates", method = RequestMethod.GET)
     void setOrderDates() {
         reportService.setOrderDates();
-    }
-
-    @RequestMapping(value = "/setOrderInvoices", method = RequestMethod.GET)
-    void setOrderInvoices() {
-        reportService.setOrderInvoices();
     }
 
 }

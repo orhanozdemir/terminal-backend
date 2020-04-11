@@ -15,6 +15,10 @@ public interface TsoftInterface {
                                    @Field("limit") int limit, @Field("orderby") String orderBy, @Field("f") String f);
 
     @FormUrlEncoded
+    @POST("order2/getOrders")
+    Call<OrderDataModel> getSingleOrder(@Field("token") String token, @Field("FetchPackageContent") Boolean FetchPackageContent, @Field("OrderCode") String orderCode);
+
+    @FormUrlEncoded
     @POST("order2/updateOrderStatusAs/1202")
     Call<GenericTsoftResponseModel> updateOrderStatusToPack(@Field("token") String token, @Field("data") String data);
 

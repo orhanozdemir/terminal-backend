@@ -13,6 +13,7 @@ import com.procsin.DB.Entity.Pack.OrderLog;
 import com.procsin.DB.Entity.Pack.Orders;
 import com.procsin.DB.Entity.UserManagement.User;
 import com.procsin.Retrofit.Models.InvoiceResponseModel;
+import com.procsin.Retrofit.Models.TSoft.OrderModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -62,6 +63,15 @@ public class OrderServiceImpl implements OrderService {
                 return tsoftService.getTSoftOrder(token);
             }
 
+        } catch (IOException e) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    @Override
+    public OrderModel getSpecificOrder(String token, String orderCode) {
+        try {
+            return tsoftService.getSingleOrder(token,orderCode);
         } catch (IOException e) {
             throw new IllegalArgumentException();
         }
@@ -176,13 +186,6 @@ public class OrderServiceImpl implements OrderService {
         throw new IllegalStateException(errorMessage);
     }
 
-//    @Override
-//    public GenericResponse createInvoice(String orderCode) {
-//        iisService.createInvoice(orderCode);
-////        updateOrderInvoiceInfo(orderCode, invoiceModel);
-////        return new GenericResponse(true,"Başarılı");
-//    }
-
     @Override
     public boolean isOrderAvailable(String orderCode) {
         List<OrderLog> logs = orderLogDao.findAllByOrderCode(orderCode);
@@ -209,40 +212,5 @@ public class OrderServiceImpl implements OrderService {
     public boolean isPackedBefore(String orderCode) {
         return orderLogDao.findReadyByOrderCode(orderCode) != null;
     }
-
-//    private Orders updateOrderInvoiceInfo(String orderCode, InvoiceResponseModel responseModel) {
-//        Orders orderModel = orderDao.findByOrderCode(orderCode);
-//        orderCode = " / " + orderCode;
-//        ErrorLog errorLog = new ErrorLog();
-//        errorLog.setDate(new Date());
-//        errorLog.setUserId(getActiveUser().getId());
-//        if (responseModel != null) {
-//            if (orderModel != null) {
-//                if (responseModel.ExceptionMessage != null && !responseModel.ExceptionMessage.isEmpty()) {
-//                    errorLog.setErrorCode("Invoice-1001");
-//                    errorLog.setErrorMessage(responseModel.ExceptionMessage + orderCode);
-//                    errorLogDao.save(errorLog);
-//                } else {
-//                    if (responseModel.EInvoiceNumber != null && (responseModel.EInvoiceNumber.isEmpty() || responseModel.EInvoiceNumber.equals("None"))) {
-//                        errorLog.setErrorCode("Invoice-1002");
-//                        errorLog.setErrorMessage("Faturası oluşturuldu, e-faturası oluşturulamadı." + orderCode);
-//                        errorLogDao.save(errorLog);
-//                    }
-//                }
-//                orderModel.setInvoiceRefNumber(responseModel.InvoiceNumber);
-//                orderModel.setInvoiceCode(responseModel.EInvoiceNumber);
-//                return orderDao.save(orderModel);
-//            }
-//            errorLog.setErrorCode("Invoice-1004");
-//            errorLog.setErrorMessage("Fatura oluşturuldu, ilgili sipariş bulunamadığı için kendi tablomuza kaydedilemedi." + orderCode);
-//            errorLogDao.save(errorLog);
-//        }
-//        else {
-//            errorLog.setErrorCode("Invoice-1003");
-//            errorLog.setErrorMessage("Fatura servisi hata verdi." + orderCode);
-//            errorLogDao.save(errorLog);
-//        }
-//        return null;
-//    }
 
 }

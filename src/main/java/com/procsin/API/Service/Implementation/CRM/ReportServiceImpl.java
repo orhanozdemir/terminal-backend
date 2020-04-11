@@ -84,26 +84,4 @@ public class ReportServiceImpl implements ReportService {
         }
     }
 
-    @Override
-    public void setOrderInvoices() {
-        List<Orders> orders = orderRepository.findOrdersWithoutInvoiceRefNumber();
-        for (Orders order : orders) {
-            try {
-                AllInvoicesResponseModel response = (AllInvoicesResponseModel) em.createNativeQuery(GET_INVOICE_DETAILS,AllInvoicesResponseModel.class)
-                        .setParameter("InternalDescription",order.getOrderCode()).getSingleResult();
-                if(!response.InvoiceNumber.isEmpty()) {
-                    order.setInvoiceRefNumber(response.InvoiceNumber);
-                }
-                if(!response.EInvoiceNumber.isEmpty()) {
-                    order.setInvoiceCode(response.EInvoiceNumber);
-                }
-                orderRepository.save(order);
-            }
-            catch (Exception e) {
-                System.out.println(order.getOrderCode());
-            }
-        }
-    }
-
-
 }

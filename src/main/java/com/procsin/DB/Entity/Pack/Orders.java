@@ -2,7 +2,6 @@ package com.procsin.DB.Entity.Pack;
 
 import com.procsin.API.Model.TSOFT.OrderResponseModel;
 import com.procsin.Retrofit.Models.TSoft.OrderModel;
-
 import javax.persistence.*;
 import java.util.Date;
 
@@ -10,7 +9,8 @@ import java.util.Date;
 @Table(name = "Orders", schema = "sevk", catalog = "PRS_SEVK")
 public class Orders {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(unique = true)
@@ -20,47 +20,24 @@ public class Orders {
     private int totalProductCount;
     private Date orderDate;
 
-    private Boolean didFail;
-
-    private String invoiceCode;
-    private String invoiceRefNumber;
-
-//    private String status;
+    private Boolean isFailed;
+    private Boolean isDamaged;
+    private Boolean isIncomplete;
+    private Boolean isReturned;
 
     public enum OrderStatusEnum {
-        CREATED,PACKING,PACKED,INVOICED,NEED_SUPPLY,CANCELED
+        CREATED, PACKING, PACKED, INVOICED, NEED_SUPPLY, CANCELED
     }
-
-//    private String deliveryAddress;
-//    private String deliveryBarcode;
-//
-//    private boolean isPrinted;
 
     public Orders() {}
 
-    public Orders(String orderCode, String deliveryName, double totalCost, int totalProductCount, Date orderDate, Boolean didFail, String invoiceCode, String invoiceRefNumber) {
+    public Orders(String orderCode, String deliveryName, double totalCost, int totalProductCount, Date orderDate) {
         this.orderCode = orderCode;
         this.deliveryName = deliveryName;
         this.totalCost = totalCost;
         this.totalProductCount = totalProductCount;
         this.orderDate = orderDate;
-        this.didFail = didFail;
-        this.invoiceCode = invoiceCode;
-        this.invoiceRefNumber = invoiceRefNumber;
     }
-
-    //    public Orders(String orderCode, String deliveryName, double totalCost, int totalProductCount, Date orderDate, Boolean didFail, String invoiceCode, String invoiceRefNumber, String deliveryAddress, String deliveryBarcode) {
-//        this.orderCode = orderCode;
-//        this.deliveryName = deliveryName;
-//        this.totalCost = totalCost;
-//        this.totalProductCount = totalProductCount;
-//        this.orderDate = orderDate;
-//        this.didFail = didFail;
-//        this.invoiceCode = invoiceCode;
-//        this.invoiceRefNumber = invoiceRefNumber;
-//        this.deliveryAddress = deliveryAddress;
-//        this.deliveryBarcode = deliveryBarcode;
-//    }
 
     public Orders(OrderResponseModel model) {
         this.orderCode = model.OrderCode;
@@ -125,51 +102,35 @@ public class Orders {
         this.orderDate = orderDate;
     }
 
-    public Boolean getDidFail() {
-        return didFail;
+    public Boolean getFailed() {
+        return isFailed;
     }
 
-    public void setDidFail(Boolean didFail) {
-        this.didFail = didFail;
+    public void setFailed(Boolean failed) {
+        isFailed = failed;
     }
 
-    public String getInvoiceCode() {
-        return invoiceCode;
+    public Boolean getDamaged() {
+        return isDamaged;
     }
 
-    public void setInvoiceCode(String invoiceCode) {
-        this.invoiceCode = invoiceCode;
+    public void setDamaged(Boolean damaged) {
+        isDamaged = damaged;
     }
 
-    public String getInvoiceRefNumber() {
-        return invoiceRefNumber;
+    public Boolean getIncomplete() {
+        return isIncomplete;
     }
 
-    public void setInvoiceRefNumber(String invoiceRefNumber) {
-        this.invoiceRefNumber = invoiceRefNumber;
+    public void setIncomplete(Boolean incomplete) {
+        isIncomplete = incomplete;
     }
 
-    //    public String getDeliveryAddress() {
-//        return deliveryAddress;
-//    }
-//
-//    public void setDeliveryAddress(String deliveryAddress) {
-//        this.deliveryAddress = deliveryAddress;
-//    }
-//
-//    public String getDeliveryBarcode() {
-//        return deliveryBarcode;
-//    }
-//
-//    public void setDeliveryBarcode(String deliveryBarcode) {
-//        this.deliveryBarcode = deliveryBarcode;
-//    }
-//
-//    public boolean isPrinted() {
-//        return isPrinted;
-//    }
-//
-//    public void setPrinted(boolean printed) {
-//        isPrinted = printed;
-//    }
+    public Boolean getReturned() {
+        return isReturned;
+    }
+
+    public void setReturned(Boolean returned) {
+        isReturned = returned;
+    }
 }
