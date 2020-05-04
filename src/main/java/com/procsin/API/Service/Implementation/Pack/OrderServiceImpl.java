@@ -14,6 +14,7 @@ import com.procsin.DB.Entity.Pack.Orders;
 import com.procsin.DB.Entity.UserManagement.User;
 import com.procsin.Retrofit.Models.InvoiceResponseModel;
 import com.procsin.Retrofit.Models.TSoft.OrderModel;
+import com.procsin.Retrofit.Models.TSoft.ProductModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -71,7 +72,13 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderModel getSpecificOrder(String token, String orderCode) {
         try {
-            return tsoftService.getSingleOrder(token,orderCode);
+            OrderModel order = tsoftService.getSingleOrder(token,orderCode);
+
+            for (ProductModel model : order.OrderDetails) {
+                order.totalProductCount += model.Quantity;
+            }
+
+            return order;
         } catch (IOException e) {
             throw new IllegalArgumentException();
         }
@@ -165,14 +172,18 @@ public class OrderServiceImpl implements OrderService {
             createErrorLog(errorCode,errorMessage + " / " + orderCode);
             throw new IllegalStateException(errorMessage);
         }
+
         try {
             if (!isTrendyol) {
-                GenericTsoftResponseModel response = tsoftService.updateOrderStatus(token, orderCode, Orders.OrderStatusEnum.CANCELED);
-                if (response == null || !response.success) {
-                    String errorCode = "Order-1010";
-                    String errorMessage = errorCode + "/" + "sipariş iptal edilirken sorun oluştu.";
-                    createErrorLog(errorCode,errorMessage + " / " + orderCode);
-                    throw new IllegalStateException(errorMessage);
+                OrderModel temp = getSpecificOrder(token,orderCode);
+                if (temp.OrderStatusId.equals("1202")) {
+                    GenericTsoftResponseModel response = tsoftService.updateOrderStatus(token, orderCode, Orders.OrderStatusEnum.CANCELED);
+                    if (response == null || !response.success) {
+                        String errorCode = "Order-1010";
+                        String errorMessage = errorCode + "/" + "sipariş iptal edilirken sorun oluştu.";
+                        createErrorLog(errorCode,errorMessage + " / " + orderCode);
+                        throw new IllegalStateException(errorMessage);
+                    }
                 }
             }
 //            orderLogService.updateOrderStatus(order.getOrderCode(),Orders.OrderStatusEnum.CANCELED);

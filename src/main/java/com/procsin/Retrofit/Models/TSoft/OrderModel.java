@@ -14,6 +14,7 @@ public class OrderModel {
     public String DeliveryName;
     public String DeliveryAddress;
     public String Cargo;
+    public String OrderStatusId;
     public Date OrderDate;
     public long OrderDateTimeStamp;
     public double OrderTotalPrice;
