@@ -3,8 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="3f52f282-717d-480b-a032-7be4c2aacfd3" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/procsin/DB/Entity/CRM/FailureLog.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/procsin/DB/Entity/CRM/ReturnedProduct.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/procsin/API/Service/Implementation/Pack/OrderServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/procsin/API/Service/Implementation/Pack/OrderServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/procsin/Retrofit/Models/TSoft/OrderModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/procsin/Retrofit/Models/TSoft/OrderModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/procsin/Retrofit/Models/TSoft/ProductModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/procsin/Retrofit/Models/TSoft/ProductModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/procsin/API/Service/Implementation/Pack/OrderServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/procsin/API/Service/Implementation/Pack/OrderServiceImpl.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,18 +24,10 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="MavenImportPreferences">
-    <option name="importingSettings">
-      <MavenImportingSettings>
-        <option name="importAutomatically" value="true" />
-      </MavenImportingSettings>
-    </option>
-  </component>
   <component name="ProjectId" id="1Qj5vnMMNmCW4Oov0aIyiLsTsoH" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
@@ -243,13 +237,12 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State>
-              <option name="COLUMN_ORDER" />
-            </State>
+            <State />
           </value>
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
     <state x="560" y="265" key="#Assign_Data_Sources" timestamp="1586354026383">
