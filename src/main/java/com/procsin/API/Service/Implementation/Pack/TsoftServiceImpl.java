@@ -40,6 +40,7 @@ import javax.persistence.EntityManager;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -143,8 +144,11 @@ public class TsoftServiceImpl implements TsoftService {
 
     private OrderLogSuccessModel prepareTsoftOrder(String token, OrderModel orderModel) {
         Orders order = orderRepository.findByOrderCode(orderModel.OrderCode);
+
+        refundCheck(orderModel);
+
         if (order == null) {
-            orderModel.setTotalProductCount();
+//            orderModel.setTotalProductCount();
             order = new Orders(orderModel);
             orderRepository.save(order);
         }
@@ -213,6 +217,37 @@ public class TsoftServiceImpl implements TsoftService {
             return new OrderLogSuccessModel(false,"Hata",null,null);
         }
         return new OrderLogSuccessModel(false,"Hata",null,null);
+    }
+
+    private void refundCheck(OrderModel orderModel) {
+        int tempTotal = 0;
+        for (ProductModel model : new ArrayList<ProductModel>(orderModel.OrderDetails)) {
+            if (model.IsPackage.equals("1")) {
+                for (ProductModel innerModel : model.PackageContent) {
+                    innerModel.Quantity = innerModel.Quantity - innerModel.RefundCount;
+                    if (innerModel.count == null) {
+                        innerModel.count = model.Quantity;
+                        innerModel.setTotalCount(innerModel.count);
+                        tempTotal += innerModel.count;
+                    }
+                    if (innerModel.Quantity == 0) {
+                        orderModel.OrderDetails.remove(model);
+                    }
+                }
+            }
+            else {
+                model.Quantity = model.Quantity - model.RefundCount;
+                if (model.count == null) {
+                    model.count = model.Quantity;
+                    model.setTotalCount(model.count);
+                    tempTotal += model.count;
+                }
+                if (model.Quantity == 0) {
+                    orderModel.OrderDetails.remove(model);
+                }
+            }
+        }
+        orderModel.totalProductCount = tempTotal;
     }
 
     private void createErrorLog(String errorCode, String errorMessage) {

@@ -59,6 +59,10 @@ public class OrderModel {
         for (ProductModel model : OrderDetails) {
             if (model.IsPackage.equals("1")) {
                 for (ProductModel innerModel : model.PackageContent) {
+                    innerModel.Quantity = innerModel.Quantity - innerModel.RefundCount;
+                    if (innerModel.Quantity == 0) {
+                        OrderDetails.remove(innerModel);
+                    }
                     if (innerModel.count == null) {
                         innerModel.count = model.Quantity;
                         innerModel.setTotalCount(innerModel.count);
@@ -68,6 +72,10 @@ public class OrderModel {
             }
             else {
                 if (model.count == null) {
+                    model.Quantity = model.Quantity - model.RefundCount;
+                    if (model.Quantity == 0) {
+                        OrderDetails.remove(model);
+                    }
                     model.count = model.Quantity;
                     model.setTotalCount(model.count);
                     tempTotal += model.count;
