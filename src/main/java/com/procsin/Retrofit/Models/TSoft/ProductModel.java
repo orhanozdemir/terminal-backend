@@ -15,6 +15,7 @@ public class ProductModel {
     public String ImageUrlBig;
     public String Vat;
     public String DiscountedPrice;
+    public int RefundCount;
 
     @Expose
     public Boolean isProcessed = false;
