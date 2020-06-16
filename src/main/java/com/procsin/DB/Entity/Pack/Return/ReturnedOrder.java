@@ -1,6 +1,7 @@
 package com.procsin.DB.Entity.Pack.Return;
 
 import com.procsin.DB.Entity.UserManagement.User;
+import com.procsin.Retrofit.Models.TSoft.OrderModel;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -15,7 +16,7 @@ public class ReturnedOrder {
         YENIDEN_CIKIS_SAGLANDI,
         KISMI_GONDERIM_BEKLENIYOR,
         KISMI_GONDERIM_SAGLANDI,
-        GIDER_PUSULASI_BEKLENIYOR,
+        TESLIM_ALINMAYAN_SIPARIS,
         GIDER_PUSULASI_KESILDI
     }
 
@@ -26,6 +27,7 @@ public class ReturnedOrder {
     public String orderCode;
     public String customerFullName;
     public ReturnedOrderStatus status;
+
     public String description;
     public Date createdAt;
     public Date lastUpdatedAt;
@@ -38,4 +40,16 @@ public class ReturnedOrder {
     public String trackingCode;
 
     public ReturnedOrder() {}
+
+    public ReturnedOrder(OrderModel orderModel, User user) {
+        this.orderCode = orderModel.OrderCode;
+        this.customerFullName = orderModel.DeliveryName;
+        this.status = ReturnedOrderStatus.MUSTERI_HIZMETLERI_BEKLENIYOR;
+        this.createdAt = new Date();
+        this.createdBy = user;
+        this.lastUpdatedAt = new Date();
+        this.lastUpdatedBy = user;
+        this.description = "";
+        this.trackingCode = "";
+    }
 }

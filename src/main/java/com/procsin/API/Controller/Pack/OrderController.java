@@ -9,16 +9,17 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping(value = "/web")
+@RequestMapping(value = "/order")
 @RestController
 public class OrderController {
 
     @Autowired
     ReturnedOrderService returnedOrderService;
 
-    @RequestMapping(value = "/returnOrders", method = RequestMethod.POST)
-    GenericResponse returnOrders(@RequestBody List<OrderModel> orders) {
-        return null;
+    @RequestMapping(value = "/returnOrder", method = RequestMethod.POST)
+    GenericResponse returnOrders(@RequestBody OrderModel order) {
+        returnedOrderService.createReturnedOrder(order);
+        return new GenericResponse(true, "Başarılı");
     }
 
     @CrossOrigin
@@ -32,5 +33,12 @@ public class OrderController {
     List<ReturnedOrder> returnedOrderList() {
         return returnedOrderService.allReturnedOrders();
     }
+
+    @CrossOrigin
+    @RequestMapping(value = "/updateReturnedOrder", method = RequestMethod.POST)
+    ReturnedOrder updateReturnedOrder(@RequestBody ReturnedOrder param) {
+        return returnedOrderService.updateReturnedOrder(param.id, param.status, param.description, param.trackingCode);
+    }
+
 
 }

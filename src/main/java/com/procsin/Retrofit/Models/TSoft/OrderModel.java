@@ -28,6 +28,8 @@ public class OrderModel {
     @Expose
     public int totalProductCount;
 
+    public OrderModel() {}
+
     public OrderModel(TrendyolOrder model) {
         this.OrderCode = "TY"  + model.orderNumber;
         this.DeliveryName = model.shipmentAddress.fullName;

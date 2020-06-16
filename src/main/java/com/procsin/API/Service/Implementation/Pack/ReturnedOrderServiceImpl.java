@@ -7,6 +7,7 @@ import com.procsin.API.Service.Interface.Pack.ReturnedOrderService;
 import com.procsin.DB.Entity.Pack.Return.ReturnedOrder;
 import com.procsin.DB.Entity.Pack.Return.ReturnedOrderLog;
 import com.procsin.DB.Entity.UserManagement.User;
+import com.procsin.Retrofit.Models.TSoft.OrderModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,20 +35,34 @@ public class ReturnedOrderServiceImpl implements ReturnedOrderService {
     }
 
     @Override
-    public ReturnedOrder createReturnedOrder(ReturnedOrder returnedOrder) {
-        returnedOrder.createdAt = new Date();
-        returnedOrder.createdBy = getActiveUser();
-
+    public ReturnedOrder createReturnedOrder(OrderModel orderModel) {
+        ReturnedOrder returnedOrder = new ReturnedOrder(orderModel,getActiveUser());
         return returnedOrderDAO.save(returnedOrder);
     }
 
     @Override
-    public ReturnedOrder updateReturnedOrder(Long id, ReturnedOrder.ReturnedOrderStatus status) {
+    public ReturnedOrder updateReturnedOrder(Long id, ReturnedOrder.ReturnedOrderStatus status, String description, String trackingCode) {
         ReturnedOrder returnedOrder = returnedOrderDAO.findById(id).isPresent() ? returnedOrderDAO.findById(id).get() : null;
         if (returnedOrder != null) {
-            returnedOrder.status = status;
-            returnedOrder.lastUpdatedAt = new Date();
-            returnedOrder.lastUpdatedBy = getActiveUser();
+            boolean didUpdate = false;
+            if (status != null) {
+                returnedOrder.status = status;
+                didUpdate = true;
+            }
+            if (description != null) {
+                returnedOrder.description = description;
+                didUpdate = true;
+            }
+
+            if (trackingCode != null) {
+                returnedOrder.trackingCode = trackingCode;
+                didUpdate = true;
+            }
+
+            if (didUpdate) {
+                returnedOrder.lastUpdatedAt = new Date();
+//                returnedOrder.lastUpdatedBy = getActiveUser();
+            }
 
             return returnedOrderDAO.save(returnedOrder);
         }
@@ -59,7 +74,7 @@ public class ReturnedOrderServiceImpl implements ReturnedOrderService {
         ReturnedOrder returnedOrder = returnedOrderDAO.findById(id).isPresent() ? returnedOrderDAO.findById(id).get() : null;
         ReturnedOrderLog log = new ReturnedOrderLog(returnedOrder,status,getActiveUser());
         returnedOrderLogDAO.save(log);
-        updateReturnedOrder(id,status);
+        updateReturnedOrder(id,status,null,null);
         return log;
     }
 
