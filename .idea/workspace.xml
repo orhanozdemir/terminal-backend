@@ -2,14 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3f52f282-717d-480b-a032-7be4c2aacfd3" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/target/classes/com/procsin/API/Service/Implementation/Pack/OrderServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/procsin/API/Service/Implementation/Pack/OrderServiceImpl.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/procsin/Configuration/WebSecurityConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/procsin/Configuration/WebSecurityConfig.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/terminal-backend.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="Android_ARMv7a" />
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
@@ -28,6 +30,8 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SearchEverywhereHistoryKey" value="&#9;FILE&#9;file:///Users/Orhan/PROCSIN PROJECTS/terminal-backend/src/main/java/com/procsin/API/Service/Implementation/Pack/OrderServiceImpl.java" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
@@ -223,11 +227,12 @@
       <workItem from="1585587971212" duration="3068000" />
       <workItem from="1585608003916" duration="791000" />
       <workItem from="1586346135932" duration="14457000" />
+      <workItem from="1592305280729" duration="101000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="1" />
+    <option name="version" value="2" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -246,6 +251,10 @@
       <screen x="0" y="0" width="1920" height="1200" />
     </state>
     <state x="560" y="265" key="#Assign_Data_Sources/0.0.1920.1200@0.0.1920.1200" timestamp="1586354026383" />
+    <state x="424" y="262" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1592305322473">
+      <screen x="0" y="0" width="1920" height="1200" />
+    </state>
+    <state x="424" y="262" key="#com.intellij.execution.impl.EditConfigurationsDialog/-1920.0.1920.1080/0.0.1920.1200@0.0.1920.1200" timestamp="1592305322473" />
     <state x="773" y="316" key="#com.intellij.ide.util.MemberChooser" timestamp="1586597626758">
       <screen x="0" y="0" width="1920" height="1200" />
     </state>
@@ -262,21 +271,25 @@
       <screen x="0" y="0" width="1920" height="1200" />
     </state>
     <state x="723" y="310" key="#xdebugger.evaluate/0.0.1920.1200@0.0.1920.1200" timestamp="1586524570976" />
-    <state width="1878" height="279" key="GridCell.Tab.0.bottom" timestamp="1588561588516">
+    <state width="1878" height="362" key="GridCell.Tab.0.bottom" timestamp="1592305288201">
       <screen x="0" y="0" width="1920" height="1200" />
     </state>
+    <state width="1878" height="362" key="GridCell.Tab.0.bottom/-1920.0.1920.1080/0.0.1920.1200@0.0.1920.1200" timestamp="1592305288201" />
     <state width="1878" height="279" key="GridCell.Tab.0.bottom/0.0.1920.1200@0.0.1920.1200" timestamp="1588561588516" />
-    <state width="1878" height="279" key="GridCell.Tab.0.center" timestamp="1588561588514">
+    <state width="1878" height="362" key="GridCell.Tab.0.center" timestamp="1592305288198">
       <screen x="0" y="0" width="1920" height="1200" />
     </state>
+    <state width="1878" height="362" key="GridCell.Tab.0.center/-1920.0.1920.1080/0.0.1920.1200@0.0.1920.1200" timestamp="1592305288198" />
     <state width="1878" height="279" key="GridCell.Tab.0.center/0.0.1920.1200@0.0.1920.1200" timestamp="1588561588514" />
-    <state width="1878" height="279" key="GridCell.Tab.0.left" timestamp="1588561588513">
+    <state width="1878" height="362" key="GridCell.Tab.0.left" timestamp="1592305288197">
       <screen x="0" y="0" width="1920" height="1200" />
     </state>
+    <state width="1878" height="362" key="GridCell.Tab.0.left/-1920.0.1920.1080/0.0.1920.1200@0.0.1920.1200" timestamp="1592305288197" />
     <state width="1878" height="279" key="GridCell.Tab.0.left/0.0.1920.1200@0.0.1920.1200" timestamp="1588561588513" />
-    <state width="1878" height="279" key="GridCell.Tab.0.right" timestamp="1588561588515">
+    <state width="1878" height="362" key="GridCell.Tab.0.right" timestamp="1592305288200">
       <screen x="0" y="0" width="1920" height="1200" />
     </state>
+    <state width="1878" height="362" key="GridCell.Tab.0.right/-1920.0.1920.1080/0.0.1920.1200@0.0.1920.1200" timestamp="1592305288200" />
     <state width="1878" height="279" key="GridCell.Tab.0.right/0.0.1920.1200@0.0.1920.1200" timestamp="1588561588515" />
     <state width="1878" height="279" key="GridCell.Tab.1.bottom" timestamp="1588561630388">
       <screen x="0" y="0" width="1920" height="1200" />
