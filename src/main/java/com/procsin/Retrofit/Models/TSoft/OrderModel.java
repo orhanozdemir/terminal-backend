@@ -18,6 +18,7 @@ public class OrderModel {
     public Date OrderDate;
     public long OrderDateTimeStamp;
     public double OrderTotalPrice;
+    public String PaymentType;
 
     public String Application;
 

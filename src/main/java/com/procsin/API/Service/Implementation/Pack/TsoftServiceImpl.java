@@ -77,7 +77,6 @@ public class TsoftServiceImpl implements TsoftService {
     OrderLogService orderLogService;
     @Autowired
     TrendyolService trendyolService;
-
     @Autowired
     OrderDao orderRepository;
     @Autowired
@@ -118,12 +117,17 @@ public class TsoftServiceImpl implements TsoftService {
 
     @Override
     public OrderModel getSingleOrder(String token, String orderCode) throws IOException {
-        OrderDataModel response = repo.getSingleOrder(token,true,orderCode).execute().body();
+        OrderDataModel response = null;
+        response = repo.getSingleOrder(token,true,orderCode,"0").execute().body();
         if (response != null) {
-            if (response.data != null && response.data.size() > 0) {
+            if (response.data == null || response.data.size() == 0) {
+                response = repo.getSingleOrder(token,true,orderCode,"1").execute().body();
+            }
+            if (response != null && response.data != null && response.data.size() > 0) {
                 return response.data.get(0);
             }
         }
+
         throw new IllegalArgumentException();
     }
 

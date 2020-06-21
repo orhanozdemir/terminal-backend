@@ -27,7 +27,8 @@ public class ReturnedOrder {
     public String orderCode;
     public String customerFullName;
     public ReturnedOrderStatus status;
-
+    public Double orderAmount;
+    public String orderType;
     public String description;
     public Date createdAt;
     public Date lastUpdatedAt;
@@ -45,6 +46,7 @@ public class ReturnedOrder {
         this.orderCode = orderModel.OrderCode;
         this.customerFullName = orderModel.DeliveryName;
         this.status = ReturnedOrderStatus.MUSTERI_HIZMETLERI_BEKLENIYOR;
+        this.orderAmount = orderModel.OrderTotalPrice;
         this.createdAt = new Date();
         this.createdBy = user;
         this.lastUpdatedAt = new Date();

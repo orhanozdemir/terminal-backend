@@ -16,7 +16,8 @@ public interface TsoftInterface {
 
     @FormUrlEncoded
     @POST("order2/getOrders")
-    Call<OrderDataModel> getSingleOrder(@Field("token") String token, @Field("FetchPackageContent") Boolean FetchPackageContent, @Field("OrderCode") String orderCode);
+    Call<OrderDataModel> getSingleOrder(@Field("token") String token, @Field("FetchPackageContent") Boolean FetchPackageContent,
+                                        @Field("OrderCode") String orderCode, @Field("Archive") String archive);
 
     @FormUrlEncoded
     @POST("order2/updateOrderStatusAs/1202")
