@@ -8,6 +8,7 @@ import com.procsin.API.DAO.Pack.OrderLogDao;
 import com.procsin.API.DAO.UserDao;
 import com.procsin.API.Model.GenericResponse;
 import com.procsin.API.Model.OrderLogSuccessModel;
+import com.procsin.API.Model.TSOFT.CreateOrderRequestModel;
 import com.procsin.API.Model.TSOFT.GenericTsoftResponseModel;
 import com.procsin.API.Service.Interface.Pack.*;
 import com.procsin.Configuration.BasicAuthInterceptor;
@@ -72,11 +73,7 @@ public class TsoftServiceImpl implements TsoftService {
     @Autowired
     OrderService orderService;
     @Autowired
-    IISService iisService;
-    @Autowired
     OrderLogService orderLogService;
-    @Autowired
-    TrendyolService trendyolService;
     @Autowired
     OrderDao orderRepository;
     @Autowired
@@ -143,6 +140,19 @@ public class TsoftServiceImpl implements TsoftService {
             case NEED_SUPPLY:
                 return repo.updateOrderStatusToSupplement(token,updateOrderDataString(orderCode)).execute().body();
         }
+        return null;
+    }
+
+    @Override
+    public GenericResponse createOrder(String token, String orderCode) {
+        OrderModel existingOrder = null;
+        try {
+            existingOrder = getSingleOrder(token,orderCode);
+        } catch (IOException e) {
+            throw new IllegalArgumentException();
+        }
+        CreateOrderRequestModel requestModel = new CreateOrderRequestModel(existingOrder);
+        String data = requestModel.generatePostDataString();
         return null;
     }
 

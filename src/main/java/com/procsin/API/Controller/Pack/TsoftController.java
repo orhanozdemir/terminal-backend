@@ -43,4 +43,9 @@ public class TsoftController {
     GenericResponse cancelOrder(@RequestParam String token, @RequestParam String orderCode) {
         return orderService.cancelOrder(token, orderCode);
     }
+
+    @RequestMapping(value = "/createOrder", method = RequestMethod.POST)
+    GenericResponse createOrder(@RequestParam String token, @RequestParam String orderCode) {
+        return tsoftService.createOrder(token,orderCode);
+    }
 }
