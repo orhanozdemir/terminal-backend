@@ -1,6 +1,7 @@
 package com.procsin.API.Controller.Pack;
 
 import com.procsin.API.Model.GenericResponse;
+import com.procsin.API.Model.ReturnOrderRequestModel;
 import com.procsin.API.Service.Interface.Pack.ReturnedOrderService;
 import com.procsin.DB.Entity.Pack.Return.ReturnedOrder;
 import com.procsin.Retrofit.Models.TSoft.OrderModel;
@@ -17,8 +18,8 @@ public class OrderController {
     ReturnedOrderService returnedOrderService;
 
     @RequestMapping(value = "/returnOrder", method = RequestMethod.POST)
-    GenericResponse returnOrders(@RequestBody OrderModel order) {
-        returnedOrderService.createReturnedOrder(order);
+    GenericResponse returnOrders(@RequestBody ReturnOrderRequestModel model) {
+        returnedOrderService.createReturnedOrder(model);
         return new GenericResponse(true, "Başarılı");
     }
 
@@ -40,5 +41,9 @@ public class OrderController {
         return returnedOrderService.updateReturnedOrder(param.id, param.status, param.description, param.trackingCode);
     }
 
+    @RequestMapping(value = "/try", method = RequestMethod.GET)
+    void sth(@RequestParam String token) {
+        returnedOrderService.updateRequiredFields(token);
+    }
 
 }

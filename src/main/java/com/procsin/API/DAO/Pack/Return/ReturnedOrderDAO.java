@@ -8,4 +8,5 @@ import java.util.List;
 @Repository
 public interface ReturnedOrderDAO extends CrudRepository<ReturnedOrder,Long> {
     List<ReturnedOrder> findAllByStatus(ReturnedOrder.ReturnedOrderStatus status);
+    List<ReturnedOrder> findAllByOrderTypeIsNull();
 }
