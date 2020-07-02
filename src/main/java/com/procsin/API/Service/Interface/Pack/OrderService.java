@@ -12,6 +12,8 @@ public interface OrderService {
     GenericResponse updateToSupplement(String token, String orderCode);
     GenericResponse cancelOrder(String token, String orderCode);
 
+    OrderLogSuccessModel getReturnedOrder(String token);
+
     boolean isOrderAvailable(String orderCode);
     boolean isPackedBefore(String orderCode);
 

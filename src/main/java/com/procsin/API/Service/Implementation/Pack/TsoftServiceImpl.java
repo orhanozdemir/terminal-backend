@@ -4,14 +4,12 @@ import com.procsin.API.DAO.CampaignLogDao;
 import com.procsin.API.DAO.ErrorLogDao;
 import com.procsin.API.DAO.Pack.CampaignDao;
 import com.procsin.API.DAO.Pack.OrderDao;
-import com.procsin.API.DAO.Pack.OrderLogDao;
 import com.procsin.API.DAO.UserDao;
 import com.procsin.API.Model.GenericResponse;
 import com.procsin.API.Model.OrderLogSuccessModel;
 import com.procsin.API.Model.TSOFT.CreateOrderRequestModel;
 import com.procsin.API.Model.TSOFT.GenericTsoftResponseModel;
 import com.procsin.API.Service.Interface.Pack.*;
-import com.procsin.Configuration.BasicAuthInterceptor;
 import com.procsin.DB.Entity.ErrorLog;
 import com.procsin.DB.Entity.Pack.Campaign;
 import com.procsin.DB.Entity.Pack.CampaignLog;
@@ -19,22 +17,15 @@ import com.procsin.DB.Entity.Pack.OrderLog;
 import com.procsin.DB.Entity.Pack.Orders;
 import com.procsin.DB.Entity.UserManagement.User;
 import com.procsin.Retrofit.Interfaces.TsoftInterface;
-import com.procsin.Retrofit.Models.InvoiceResponseModel;
 import com.procsin.Retrofit.Models.TSoft.OrderDataModel;
 import com.procsin.Retrofit.Models.TSoft.OrderModel;
 import com.procsin.Retrofit.Models.TSoft.ProductModel;
-import com.procsin.TrendyolAPI.Interface.TrendyolInterface;
-import com.procsin.TrendyolAPI.Model.OrderTransferLog;
-import com.procsin.TrendyolAPI.Model.TrendyolOrdersResponseModel;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import javax.persistence.EntityManager;
@@ -43,7 +34,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -94,22 +84,8 @@ public class TsoftServiceImpl implements TsoftService {
 
     @Override
     public OrderLogSuccessModel getTSoftOrder(String token) throws IOException {
-        String tsoftSearchQuery = "OrderCode | TS | startswith";
-        OrderDataModel response = repo.getOrders(token,"1204",true,5,"OrderDateTimeStamp ASC", tsoftSearchQuery).execute().body();
-        if (response != null) {
-            if (response.data != null && response.data.size() > 0) {
-                for (OrderModel model : response.data) {
-                    OrderLogSuccessModel successModel = prepareTsoftOrder(token,model);
-                    if (successModel.success) {
-                        return successModel;
-                    }
-                }
-            }
-            else if (response.success) {
-                return new OrderLogSuccessModel(true,"Sistemde bekleyen sipariş kalmadı.",null,null);
-            }
-        }
-        throw new IllegalArgumentException();
+        OrderDataModel response = getOrderByStatus(token, "1204");
+        return handleOrderResponse(token, response);
     }
 
     @Override
@@ -146,14 +122,54 @@ public class TsoftServiceImpl implements TsoftService {
     @Override
     public GenericResponse createOrder(String token, String orderCode) {
         OrderModel existingOrder = null;
-        try {
-            existingOrder = getSingleOrder(token,orderCode);
-        } catch (IOException e) {
-            throw new IllegalArgumentException();
+
+        String[] codes = orderCode.split(",");
+
+        for (String code : codes) {
+            try {
+                existingOrder = getSingleOrder(token,code);
+            } catch (IOException e) {
+                throw new IllegalArgumentException();
+            }
+            CreateOrderRequestModel requestModel = new CreateOrderRequestModel(existingOrder);
+            String data = requestModel.generatePostDataString().replace("\n","").replace("\r","");
+            try {
+                repo.createOrder(token,data).execute();
+            } catch (IOException e) {
+                return new GenericResponse(false, code);
+            }
+//            return new GenericResponse(true, code);
         }
-        CreateOrderRequestModel requestModel = new CreateOrderRequestModel(existingOrder);
-        String data = requestModel.generatePostDataString();
-        return null;
+        return new GenericResponse(false, orderCode);
+    }
+
+    @Override
+    public OrderLogSuccessModel getReturnedOrder(String token) throws IOException {
+        OrderDataModel response = getOrderByStatus(token, "1206");
+        return handleOrderResponse(token,response);
+    }
+
+    private OrderDataModel getOrderByStatus(String token, String statusId) throws IOException {
+        String tsoftSearchQuery = "OrderCode | TS | startswith";
+        String tsoftSortQuery = "OrderDateTimeStamp ASC";
+        return repo.getOrders(token,statusId,true,1, tsoftSortQuery, tsoftSearchQuery).execute().body();
+    }
+
+    private OrderLogSuccessModel handleOrderResponse(String token, OrderDataModel response) {
+        if (response != null) {
+            if (response.data != null && response.data.size() > 0) {
+                for (OrderModel model : response.data) {
+                    OrderLogSuccessModel successModel = prepareTsoftOrder(token,model);
+                    if (successModel.success) {
+                        return successModel;
+                    }
+                }
+            }
+            else if (response.success) {
+                return new OrderLogSuccessModel(true,"Sistemde bekleyen sipariş kalmadı.",null,null);
+            }
+        }
+        throw new IllegalArgumentException();
     }
 
     private OrderLogSuccessModel prepareTsoftOrder(String token, OrderModel orderModel) {

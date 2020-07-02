@@ -196,6 +196,15 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public OrderLogSuccessModel getReturnedOrder(String token) {
+        try {
+            return tsoftService.getReturnedOrder(token);
+        } catch (IOException e) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    @Override
     public boolean isOrderAvailable(String orderCode) {
         List<OrderLog> logs = orderLogDao.findAllByOrderCode(orderCode);
         if (logs != null && logs.size() > 0) {
