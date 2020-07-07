@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3f52f282-717d-480b-a032-7be4c2aacfd3" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/terminal-backend.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/procsin/API/Controller/Pack/TsoftController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/procsin/API/Controller/Pack/TsoftController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/procsin/API/Model/TSOFT/CreateOrderRequestModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/procsin/API/Model/TSOFT/CreateOrderRequestModel.java" afterDir="false" />
@@ -18,6 +20,7 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="Android_ARMv7a" />
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
@@ -263,6 +266,7 @@
       <workItem from="1593497159201" duration="212000" />
       <workItem from="1593502933248" duration="18682000" />
       <workItem from="1593677905315" duration="1628000" />
+      <workItem from="1592305280729" duration="101000" />
     </task>
     <servers />
   </component>
@@ -287,6 +291,11 @@
     </state>
     <state x="560" y="265" key="#Assign_Data_Sources/0.0.1920.1200@0.0.1920.1200" timestamp="1586354026383" />
     <state x="448" y="181" key="#Project_Structure" timestamp="1590875244111">
+    <state x="424" y="262" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1592305322473">
+      <screen x="0" y="0" width="1920" height="1200" />
+    </state>
+    <state x="424" y="262" key="#com.intellij.execution.impl.EditConfigurationsDialog/-1920.0.1920.1080/0.0.1920.1200@0.0.1920.1200" timestamp="1592305322473" />
+    <state x="773" y="316" key="#com.intellij.ide.util.MemberChooser" timestamp="1586597626758">
       <screen x="0" y="0" width="1920" height="1200" />
     </state>
     <state x="448" y="181" key="#Project_Structure/0.0.1920.1200@0.0.1920.1200" timestamp="1590875244111" />
