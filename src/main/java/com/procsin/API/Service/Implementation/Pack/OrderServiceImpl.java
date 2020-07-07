@@ -12,7 +12,6 @@ import com.procsin.DB.Entity.ErrorLog;
 import com.procsin.DB.Entity.Pack.OrderLog;
 import com.procsin.DB.Entity.Pack.Orders;
 import com.procsin.DB.Entity.UserManagement.User;
-import com.procsin.Retrofit.Models.InvoiceResponseModel;
 import com.procsin.Retrofit.Models.TSoft.OrderModel;
 import com.procsin.Retrofit.Models.TSoft.ProductModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -195,6 +193,15 @@ public class OrderServiceImpl implements OrderService {
         String errorMessage = errorCode + "/" + "sipariş iptal edilirken sorun oluştu.";
         createErrorLog(errorCode,errorMessage + " / " + orderCode);
         throw new IllegalStateException(errorMessage);
+    }
+
+    @Override
+    public OrderLogSuccessModel getReturnedOrder(String token) {
+        try {
+            return tsoftService.getReturnedOrder(token);
+        } catch (IOException e) {
+            throw new IllegalArgumentException();
+        }
     }
 
     @Override

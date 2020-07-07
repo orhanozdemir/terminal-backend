@@ -18,15 +18,37 @@ public class OrderModel {
     public Date OrderDate;
     public long OrderDateTimeStamp;
     public double OrderTotalPrice;
+    public String PaymentType;
 
     public String Application;
 
     public List<ProductModel> OrderDetails;
 
+    public String CustomerCode;
+    public int PaymentTypeId;
+    public String InvoiceAddressId;
+    public String DeliveryAddressId;
+    public String CargoCode;
+
+    public String InvoiceName;
+    public String InvoiceMobile;
+    public String InvoiceCountry;
+    public String InvoiceCity;
+    public String InvoiceTown;
+    public String InvoiceAddress;
+//    public String DeliveryName;
+    public String DeliveryMobile;
+    public String DeliveryCountry;
+    public String DeliveryCity;
+    public String DeliveryTown;
+//    public String DeliveryAddress;
+
     @Expose
     public double totalCost;
     @Expose
     public int totalProductCount;
+
+    public OrderModel() {}
 
     public OrderModel(TrendyolOrder model) {
         this.OrderCode = "TY"  + model.orderNumber;
