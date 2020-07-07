@@ -55,6 +55,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderLogSuccessModel getSingleOrder(String token, boolean isTrendyol) {
         try {
+            if (token == null) {
+                token = tsoftService.getTsoftToken();
+            }
             if (isTrendyol) {
                 return trendyolService.getOrder();
             }
@@ -70,8 +73,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderModel getSpecificOrder(String token, String orderCode) {
         try {
+            if (token == null) {
+                token = tsoftService.getTsoftToken();
+            }
             OrderModel order = tsoftService.getSingleOrder(token,orderCode);
-
             for (ProductModel model : order.OrderDetails) {
                 order.totalProductCount += model.Quantity;
             }
@@ -99,6 +104,9 @@ public class OrderServiceImpl implements OrderService {
             }
             try {
                 if (!isTrendyol) {
+                    if (token == null) {
+                        token = tsoftService.getTsoftToken();
+                    }
                     GenericTsoftResponseModel response = tsoftService.updateOrderStatus(token,orderCode, Orders.OrderStatusEnum.PACKED);
                     if (response == null || !response.success) {
                         String errorMessage = "Sipariş tamamlanırken bir sorun oluştu.";
@@ -106,12 +114,9 @@ public class OrderServiceImpl implements OrderService {
                         throw new IllegalStateException(errorMessage);
                     }
                 }
-
                 orderLogService.createOrderLog(order,OrderLog.OrderStatus.KARGO_HAZIR);
                 iisService.createInvoice(orderCode);
-
                 return new GenericResponse(true,"Başarılı");
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -139,18 +144,19 @@ public class OrderServiceImpl implements OrderService {
         }
         try {
             if (!isTrendyol) {
+                if (token == null) {
+                    token = tsoftService.getTsoftToken();
+                }
                 GenericTsoftResponseModel response = tsoftService.updateOrderStatus(token, orderCode, Orders.OrderStatusEnum.NEED_SUPPLY);
                 if (response == null || !response.success) {
                     throw new IllegalStateException("-");
                 }
             }
-//            orderLogService.updateOrderStatus(order.getOrderCode(),Orders.OrderStatusEnum.NEED_SUPPLY);
             orderLogService.createOrderLog(order,OrderLog.OrderStatus.TEDARIK_SURECINDE);
             return new GenericResponse(true,"Başarılı");
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return new GenericResponse(false,"Hata");
     }
 
@@ -170,10 +176,12 @@ public class OrderServiceImpl implements OrderService {
             createErrorLog(errorCode,errorMessage + " / " + orderCode);
             throw new IllegalStateException(errorMessage);
         }
-
         try {
             if (!isTrendyol) {
-                OrderModel temp = getSpecificOrder(token,orderCode);
+                if (token == null) {
+                    token = tsoftService.getTsoftToken();
+                }
+                OrderModel temp = getSpecificOrder(token, orderCode);
                 if (temp.OrderStatusId.equals("1202")) {
                     GenericTsoftResponseModel response = tsoftService.updateOrderStatus(token, orderCode, Orders.OrderStatusEnum.CANCELED);
                     if (response == null || !response.success) {
@@ -184,7 +192,6 @@ public class OrderServiceImpl implements OrderService {
                     }
                 }
             }
-//            orderLogService.updateOrderStatus(order.getOrderCode(),Orders.OrderStatusEnum.CANCELED);
             orderLogService.createOrderLog(order,OrderLog.OrderStatus.URUN_PAKETLENIYOR_IPTAL);
         } catch (IOException e) {
             e.printStackTrace();
@@ -198,6 +205,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderLogSuccessModel getReturnedOrder(String token) {
         try {
+            if (token == null) {
+                token = tsoftService.getTsoftToken();
+            }
             return tsoftService.getReturnedOrder(token);
         } catch (IOException e) {
             throw new IllegalArgumentException();

@@ -1,6 +1,7 @@
 package com.procsin.Retrofit.Interfaces;
 
 import com.procsin.API.Model.TSOFT.GenericTsoftResponseModel;
+import com.procsin.API.Model.TSOFT.LoginResponseDataModel;
 import com.procsin.Retrofit.Models.TSoft.OrderDataModel;
 import retrofit2.Call;
 import retrofit2.http.Field;
@@ -8,6 +9,10 @@ import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
 
 public interface TsoftInterface {
+
+    @FormUrlEncoded
+    @POST("auth/login/Mobile")
+    Call<LoginResponseDataModel> login(@Field("pass") String pass);
 
     @FormUrlEncoded
     @POST("order2/getOrders")
