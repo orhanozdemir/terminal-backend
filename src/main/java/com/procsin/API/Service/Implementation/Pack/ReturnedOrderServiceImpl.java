@@ -7,7 +7,6 @@ import com.procsin.API.DAO.UserDao;
 import com.procsin.API.Model.ReturnOrderRequestModel;
 import com.procsin.API.Service.Interface.Pack.OrderService;
 import com.procsin.API.Service.Interface.Pack.ReturnedOrderService;
-import com.procsin.API.Service.Interface.Pack.TsoftService;
 import com.procsin.DB.Entity.Pack.Return.ReturnedOrder;
 import com.procsin.DB.Entity.Pack.Return.ReturnedOrderLog;
 import com.procsin.DB.Entity.Pack.Return.ReturnedProduct;
@@ -17,8 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -44,10 +41,6 @@ public class ReturnedOrderServiceImpl implements ReturnedOrderService {
     private User getActiveUser() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return userRepository.findByUsername(userDetails.getUsername());
-    }
-
-    void addProducts(Long orderId, List<ReturnedProduct> returnedProducts) {
-
     }
 
     @Override

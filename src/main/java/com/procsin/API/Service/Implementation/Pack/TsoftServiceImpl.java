@@ -83,6 +83,11 @@ public class TsoftServiceImpl implements TsoftService {
     }
 
     @Override
+    public String getTsoftToken() throws IOException {
+        return repo.login("prs300377").execute().body().data.get(0).token;
+    }
+
+    @Override
     public OrderLogSuccessModel getTSoftOrder(String token) throws IOException {
         OrderDataModel response = getOrderByStatus(token, "1204");
         return handleOrderResponse(token, response);
@@ -100,7 +105,7 @@ public class TsoftServiceImpl implements TsoftService {
                 return response.data.get(0);
             }
         }
-
+        System.out.println(orderCode);
         throw new IllegalArgumentException();
     }
 

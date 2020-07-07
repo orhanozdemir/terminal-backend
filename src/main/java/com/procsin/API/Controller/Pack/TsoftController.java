@@ -22,37 +22,37 @@ public class TsoftController {
     OrderService orderService;
 
     @RequestMapping(value = "/getOne", method = RequestMethod.GET)
-    OrderLogSuccessModel getOrder(@RequestParam String token, @RequestParam boolean isTrendyol) {
+    OrderLogSuccessModel getOrder(@RequestParam(required = false) String token, @RequestParam boolean isTrendyol) {
         return orderService.getSingleOrder(token, isTrendyol);
     }
 
     @RequestMapping(value = "/getOrder", method = RequestMethod.GET)
-    OrderModel getOrder(@RequestParam String token, @RequestParam String orderCode) {
-        return orderService.getSpecificOrder(token,orderCode);
+    OrderModel getOrder(@RequestParam(required = false) String token, @RequestParam String orderCode) {
+        return orderService.getSpecificOrder(token, orderCode);
     }
 
     @RequestMapping(value = "/updateSupplement", method = RequestMethod.POST)
-    GenericResponse updateToSupplement(@RequestParam String token, @RequestParam String orderCode) {
+    GenericResponse updateToSupplement(@RequestParam(required = false) String token, @RequestParam String orderCode) {
         return orderService.updateToSupplement(token, orderCode);
     }
     @RequestMapping(value = "/finish", method = RequestMethod.POST)
-    GenericResponse finishOrder(@RequestParam String token, @RequestParam String orderCode) {
+    GenericResponse finishOrder(@RequestParam(required = false) String token, @RequestParam String orderCode) {
         return orderService.finishOrder(token, orderCode);
     }
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
-    GenericResponse cancelOrder(@RequestParam String token, @RequestParam String orderCode) {
+    GenericResponse cancelOrder(@RequestParam(required = false) String token, @RequestParam String orderCode) {
         return orderService.cancelOrder(token, orderCode);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @RequestMapping(value = "/createOrder", method = RequestMethod.POST)
-    GenericResponse createOrder(@RequestParam String token, @RequestParam String orderCode) {
+    GenericResponse createOrder(@RequestParam(required = false) String token, @RequestParam String orderCode) {
         return tsoftService.createOrder(token,orderCode);
     }
 
     @RequestMapping(value = "/getReturnedOrder", method = RequestMethod.GET)
-    OrderLogSuccessModel getReturnedOrder(@RequestParam String token) {
+    OrderLogSuccessModel getReturnedOrder(@RequestParam(required = false) String token) {
         return orderService.getReturnedOrder(token);
     }
 }
