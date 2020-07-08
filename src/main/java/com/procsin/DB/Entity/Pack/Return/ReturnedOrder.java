@@ -17,7 +17,8 @@ public class ReturnedOrder {
         KISMI_GONDERIM_BEKLENIYOR,
         KISMI_GONDERIM_SAGLANDI,
         TESLIM_ALINMAYAN_SIPARIS,
-        GIDER_PUSULASI_KESILDI
+        GIDER_PUSULASI_KESILDI,
+        MANUEL_OLUSTURULDU
     }
 
     @Id
@@ -39,6 +40,11 @@ public class ReturnedOrder {
     public User lastUpdatedBy;
 
     public String trackingCode;
+
+    public String newOrderCode;
+
+    public Boolean newOrderCreated;
+    public Boolean isCompleted;
 
     public ReturnedOrder() {}
 
