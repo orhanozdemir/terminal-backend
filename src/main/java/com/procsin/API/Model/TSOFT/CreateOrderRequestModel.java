@@ -71,7 +71,7 @@ public class CreateOrderRequestModel {
         data += "\"OrderCode\":" + "\"M" + OrderCode + "\",";
         data += "\"CustomerCode\":" + "\"" + CustomerCode + "\",";
         data += "\"Currency\":" + "\"" + Currency + "\",";
-        data += "\"PaymentTypeId\":" + "\"" + PaymentTypeId + "\",";
+        data += "\"PaymentTypeId\":" + "\"" + 52 + "\",";
         data += "\"OrderStatusId\":" + "\"" + 1206 + "\",";
 
         data += "\"InvoiceName\":" + "\"" + InvoiceName + "\",";
@@ -90,14 +90,14 @@ public class CreateOrderRequestModel {
 
 //        data += "\"InvoiceAddressId\":" + "\"" + InvoiceAddressId + "\",";
 //        data += "\"DeliveryAddressId\":" + "\"" + DeliveryAddressId + "\",";
-        data += "\"OrderTotalPrice\":" + "\"" + ((PaymentTypeId == -2) ? 0 : OrderTotalPrice) + "\",";
+        data += "\"OrderTotalPrice\":" + "\"" + 0 + "\",";
         data += "\"CargoCode\":" + "\"" + "T7" + "\",";
 
         data += "\"Products\":[";
         for (ProductModel model : Products) {
             data += "{\"ProductCode\":" + "\"" + model.ProductCode + "\",";
             data += "\"Quantity\":" + "\"" + model.Quantity + "\",";
-            data += "\"SellingPrice\":" + "\"" + ((PaymentTypeId == -2) ? 0 : model.DiscountedPrice) + "\"},";
+            data += "\"SellingPrice\":" + "\"" + 0 + "\"},";
         }
 
         data = data.substring(0, data.length() - 1);
