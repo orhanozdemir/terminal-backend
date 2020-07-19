@@ -3,13 +3,18 @@ package com.procsin.API.Controller.Pack;
 import com.procsin.API.Model.GenericResponse;
 import com.procsin.API.Model.OrderLogSuccessModel;
 import com.procsin.API.Service.Interface.Pack.OrderService;
+import com.procsin.API.Service.Interface.Pack.ReturnedOrderService;
 import com.procsin.API.Service.Interface.Pack.TsoftService;
+import com.procsin.DB.Entity.Pack.Return.ReturnedOrder;
+import com.procsin.DB.Entity.Pack.Return.ReturnedOrderStatus;
 import com.procsin.Retrofit.Models.TSoft.OrderModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/tsoft")
@@ -20,6 +25,9 @@ public class TsoftController {
 
     @Autowired
     OrderService orderService;
+
+    @Autowired
+    ReturnedOrderService returnedOrderService;
 
     @RequestMapping(value = "/getOne", method = RequestMethod.GET)
     OrderLogSuccessModel getOrder(@RequestParam(required = false) String token, @RequestParam boolean isTrendyol) {
@@ -50,6 +58,18 @@ public class TsoftController {
     GenericResponse createOrder(@RequestParam(required = false) String token, @RequestParam String orderCode) {
         return tsoftService.createOrder(token,orderCode);
     }
+
+    @RequestMapping(value = "/createAllWaitingOrders", method = RequestMethod.POST)
+    GenericResponse createAllWaitingOrders(@RequestParam(required = false) String token) {
+        List<ReturnedOrder> returnedOrders = returnedOrderService.returnedOrdersByStatus(ReturnedOrderStatus.YENIDEN_CIKIS_BEKLENIYOR);
+        for (ReturnedOrder returnedOrder : returnedOrders) {
+            if (!returnedOrder.newOrderCreated) {
+                tsoftService.createOrder(token,returnedOrder.orderCode);
+            }
+        }
+        return new GenericResponse(true,"Başarılı");
+    }
+
 
     @RequestMapping(value = "/getReturnedOrder", method = RequestMethod.GET)
     OrderLogSuccessModel getReturnedOrder(@RequestParam(required = false) String token) {

@@ -19,13 +19,13 @@ public class ReturnedOrderLog {
     @ManyToOne
     public User user;
 
-    public ReturnedOrder.ReturnedOrderStatus status;
+    public ReturnedOrderStatus status;
 
     public Date createdAt;
 
     public ReturnedOrderLog() {}
 
-    public ReturnedOrderLog(ReturnedOrder order, ReturnedOrder.ReturnedOrderStatus status, User user) {
+    public ReturnedOrderLog(ReturnedOrder order, ReturnedOrderStatus status, User user) {
         this.order = order;
         this.user = user;
         this.status = status;
