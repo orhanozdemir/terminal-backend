@@ -128,6 +128,14 @@ public class TsoftServiceImpl implements TsoftService {
     public GenericResponse createOrder(String token, String orderCode) {
         OrderModel existingOrder = null;
 
+        if (token == null) {
+            try {
+                token = getTsoftToken();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         String[] codes = orderCode.split(",");
 
         for (String code : codes) {
@@ -143,7 +151,6 @@ public class TsoftServiceImpl implements TsoftService {
             } catch (IOException e) {
                 return new GenericResponse(false, code);
             }
-//            return new GenericResponse(true, code);
         }
         return new GenericResponse(false, orderCode);
     }

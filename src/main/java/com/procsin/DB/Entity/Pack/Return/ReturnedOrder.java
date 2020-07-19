@@ -2,24 +2,12 @@ package com.procsin.DB.Entity.Pack.Return;
 
 import com.procsin.DB.Entity.UserManagement.User;
 import com.procsin.Retrofit.Models.TSoft.OrderModel;
-
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
 @Table(name = "ReturnedOrder", schema = "sevk", catalog = "PRS_SEVK")
 public class ReturnedOrder {
-
-    public enum ReturnedOrderStatus {
-        MUSTERI_HIZMETLERI_BEKLENIYOR,
-        YENIDEN_CIKIS_BEKLENIYOR,
-        YENIDEN_CIKIS_SAGLANDI,
-        KISMI_GONDERIM_BEKLENIYOR,
-        KISMI_GONDERIM_SAGLANDI,
-        TESLIM_ALINMAYAN_SIPARIS,
-        GIDER_PUSULASI_KESILDI,
-        MANUEL_OLUSTURULDU
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,6 +33,7 @@ public class ReturnedOrder {
 
     public Boolean newOrderCreated;
     public Boolean isCompleted;
+    public Boolean productsDidReturn;
 
     public ReturnedOrder() {}
 

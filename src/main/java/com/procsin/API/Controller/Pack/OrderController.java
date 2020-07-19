@@ -4,6 +4,7 @@ import com.procsin.API.Model.GenericResponse;
 import com.procsin.API.Model.ReturnOrderRequestModel;
 import com.procsin.API.Service.Interface.Pack.ReturnedOrderService;
 import com.procsin.DB.Entity.Pack.Return.ReturnedOrder;
+import com.procsin.DB.Entity.Pack.Return.ReturnedOrderStatus;
 import com.procsin.Retrofit.Models.TSoft.OrderModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ public class OrderController {
 
     @CrossOrigin
     @RequestMapping(value = "/returnedList", method = RequestMethod.GET)
-    List<ReturnedOrder> returnedOrderList(@RequestParam ReturnedOrder.ReturnedOrderStatus status) {
+    List<ReturnedOrder> returnedOrderList(@RequestParam ReturnedOrderStatus status) {
         return returnedOrderService.returnedOrdersByStatus(status);
     }
 

@@ -9,6 +9,7 @@ import com.procsin.API.Service.Interface.Pack.OrderService;
 import com.procsin.API.Service.Interface.Pack.ReturnedOrderService;
 import com.procsin.DB.Entity.Pack.Return.ReturnedOrder;
 import com.procsin.DB.Entity.Pack.Return.ReturnedOrderLog;
+import com.procsin.DB.Entity.Pack.Return.ReturnedOrderStatus;
 import com.procsin.DB.Entity.Pack.Return.ReturnedProduct;
 import com.procsin.DB.Entity.UserManagement.User;
 import com.procsin.Retrofit.Models.TSoft.OrderModel;
@@ -45,9 +46,18 @@ public class ReturnedOrderServiceImpl implements ReturnedOrderService {
 
     @Override
     public ReturnedOrder createReturnedOrder(ReturnOrderRequestModel requestModel) {
-        ReturnedOrder returnedOrder = new ReturnedOrder(requestModel.orderModel,getActiveUser());
-        returnedOrder = returnedOrderDAO.save(returnedOrder);
-
+        ReturnedOrder returnedOrder = returnedOrderDAO.findByOrderCode(requestModel.orderModel.OrderCode);
+        if (returnedOrder != null) {
+            returnedOrder.productsDidReturn = true;
+            if (shouldChangeStatus(returnedOrder,ReturnedOrderStatus.MUSTERI_HIZMETLERI_BEKLENIYOR)) {
+                return updateReturnedOrder(returnedOrder.id, ReturnedOrderStatus.MUSTERI_HIZMETLERI_BEKLENIYOR,
+                        returnedOrder.description, returnedOrder.trackingCode);
+            }
+        }
+        else {
+            returnedOrder  = new ReturnedOrder(requestModel.orderModel,getActiveUser());
+            returnedOrder = returnedOrderDAO.save(returnedOrder);
+        }
         for (ReturnedProduct returnedProduct : requestModel.products) {
             returnedProduct.returnedOrder = returnedOrder;
             returnedProductDAO.save(returnedProduct);
@@ -57,7 +67,7 @@ public class ReturnedOrderServiceImpl implements ReturnedOrderService {
     }
 
     @Override
-    public ReturnedOrder updateReturnedOrder(Long id, ReturnedOrder.ReturnedOrderStatus status, String description, String trackingCode) {
+    public ReturnedOrder updateReturnedOrder(Long id, ReturnedOrderStatus status, String description, String trackingCode) {
         ReturnedOrder returnedOrder = returnedOrderDAO.findById(id).isPresent() ? returnedOrderDAO.findById(id).get() : null;
         if (returnedOrder != null) {
             boolean didUpdate = false;
@@ -77,7 +87,7 @@ public class ReturnedOrderServiceImpl implements ReturnedOrderService {
 
             if (didUpdate) {
                 returnedOrder.lastUpdatedAt = new Date();
-//                returnedOrder.lastUpdatedBy = getActiveUser();
+                returnedOrder.lastUpdatedBy = getActiveUser();
             }
 
             return returnedOrderDAO.save(returnedOrder);
@@ -86,12 +96,9 @@ public class ReturnedOrderServiceImpl implements ReturnedOrderService {
     }
 
     @Override
-    public ReturnedOrderLog changeReturnedOrderStatus(Long id, ReturnedOrder.ReturnedOrderStatus status) {
-        ReturnedOrder returnedOrder = returnedOrderDAO.findById(id).isPresent() ? returnedOrderDAO.findById(id).get() : null;
-        ReturnedOrderLog log = new ReturnedOrderLog(returnedOrder,status,getActiveUser());
-        returnedOrderLogDAO.save(log);
+    public ReturnedOrderLog changeReturnedOrderStatus(Long id, ReturnedOrderStatus status) {
         updateReturnedOrder(id,status,null,null);
-        return log;
+        return createReturnedOrderLog(id,status);
     }
 
     @Override
@@ -102,14 +109,14 @@ public class ReturnedOrderServiceImpl implements ReturnedOrderService {
     }
 
     @Override
-    public List<ReturnedOrder> returnedOrdersByStatus(ReturnedOrder.ReturnedOrderStatus status) {
+    public List<ReturnedOrder> returnedOrdersByStatus(ReturnedOrderStatus status) {
         List<ReturnedOrder> returnedOrders = returnedOrderDAO.findAllByStatus(status);
         return returnedOrders;
     }
 
     @Override
     public List<ReturnedOrder> waitingReturnedOrders() {
-        return returnedOrdersByStatus(ReturnedOrder.ReturnedOrderStatus.MUSTERI_HIZMETLERI_BEKLENIYOR);
+        return returnedOrdersByStatus(ReturnedOrderStatus.MUSTERI_HIZMETLERI_BEKLENIYOR);
     }
 
     @Override
@@ -124,4 +131,32 @@ public class ReturnedOrderServiceImpl implements ReturnedOrderService {
                 }
         }
     }
+
+    private boolean shouldChangeStatus(ReturnedOrder returnedOrder, ReturnedOrderStatus newStatus) {
+        boolean shouldChange = false;
+
+        if (returnedOrder.isCompleted || newStatus.equals(ReturnedOrderStatus.MANUEL_OLUSTURULDU)) {
+            return false;
+        }
+
+        switch (returnedOrder.status) {
+            case YENIDEN_CIKIS_BEKLENIYOR:
+                if (newStatus.equals(ReturnedOrderStatus.YENIDEN_CIKIS_SAGLANDI))
+                    shouldChange = true;
+                break;
+            case KISMI_GONDERIM_BEKLENIYOR:
+                if (newStatus.equals(ReturnedOrderStatus.KISMI_GONDERIM_SAGLANDI))
+                    shouldChange = true;
+                break;
+        }
+        return shouldChange;
+    }
+
+    private ReturnedOrderLog createReturnedOrderLog(Long id, ReturnedOrderStatus status) {
+        ReturnedOrder returnedOrder = returnedOrderDAO.findById(id).isPresent() ? returnedOrderDAO.findById(id).get() : null;
+        ReturnedOrderLog log = new ReturnedOrderLog(returnedOrder,status,getActiveUser());
+        return returnedOrderLogDAO.save(log);
+    }
+
+
 }
