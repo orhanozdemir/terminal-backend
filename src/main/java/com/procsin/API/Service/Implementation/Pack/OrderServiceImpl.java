@@ -107,7 +107,7 @@ public class OrderServiceImpl implements OrderService {
                     if (token == null) {
                         token = tsoftService.getTsoftToken();
                     }
-                    GenericTsoftResponseModel response = tsoftService.updateOrderStatus(token,orderCode, Orders.OrderStatusEnum.PACKED);
+                    GenericTsoftResponseModel response = tsoftService.updateOrderStatus(token,false,orderCode,Orders.OrderStatusEnum.PACKED);
                     if (response == null || !response.success) {
                         String errorMessage = "Sipariş tamamlanırken bir sorun oluştu.";
                         createErrorLog("Order-1009",errorMessage + " / " + orderCode);
@@ -127,7 +127,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public GenericResponse updateToSupplement(String token, String orderCode) {
+    public GenericResponse updateToSupplement(String token, boolean isReturn, String orderCode) {
         boolean isTrendyol = orderCode.startsWith("TY");
         Orders order = orderDao.findByOrderCode(orderCode);
         if (order == null) {
@@ -147,7 +147,7 @@ public class OrderServiceImpl implements OrderService {
                 if (token == null) {
                     token = tsoftService.getTsoftToken();
                 }
-                GenericTsoftResponseModel response = tsoftService.updateOrderStatus(token, orderCode, Orders.OrderStatusEnum.NEED_SUPPLY);
+                GenericTsoftResponseModel response = tsoftService.updateOrderStatus(token,isReturn, orderCode, Orders.OrderStatusEnum.NEED_SUPPLY);
                 if (response == null || !response.success) {
                     throw new IllegalStateException("-");
                 }
@@ -161,7 +161,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public GenericResponse cancelOrder(String token, String orderCode) {
+    public GenericResponse cancelOrder(String token, boolean isReturn, String orderCode) {
         boolean isTrendyol = orderCode.startsWith("TY");
         Orders order = orderDao.findByOrderCode(orderCode);
         if (order == null) {
@@ -183,7 +183,7 @@ public class OrderServiceImpl implements OrderService {
                 }
                 OrderModel temp = getSpecificOrder(token, orderCode);
                 if (temp.OrderStatusId.equals("1202")) {
-                    GenericTsoftResponseModel response = tsoftService.updateOrderStatus(token, orderCode, Orders.OrderStatusEnum.CANCELED);
+                    GenericTsoftResponseModel response = tsoftService.updateOrderStatus(token,isReturn,orderCode, Orders.OrderStatusEnum.CANCELED);
                     if (response == null || !response.success) {
                         String errorCode = "Order-1010";
                         String errorMessage = errorCode + "/" + "sipariş iptal edilirken sorun oluştu.";

@@ -90,7 +90,7 @@ public class TsoftServiceImpl implements TsoftService {
     @Override
     public OrderLogSuccessModel getTSoftOrder(String token) throws IOException {
         OrderDataModel response = getOrderByStatus(token, "1204");
-        return handleOrderResponse(token, response);
+        return handleOrderResponse(token,false,response);
     }
 
     @Override
@@ -110,15 +110,21 @@ public class TsoftServiceImpl implements TsoftService {
     }
 
     @Override
-    public GenericTsoftResponseModel updateOrderStatus(String token, String orderCode, Orders.OrderStatusEnum status) throws IOException {
+    public GenericTsoftResponseModel updateOrderStatus(String token, boolean isReturn, String orderCode, Orders.OrderStatusEnum status) throws IOException {
         switch (status) {
             case CANCELED:
+                if (isReturn) {
+                    return repo.updateOrderStatusToReturnPreparing(token, updateOrderDataString(orderCode)).execute().body();
+                }
                 return repo.updateOrderStatusToPreparing(token, updateOrderDataString(orderCode)).execute().body();
             case PACKING:
                 return repo.updateOrderStatusToPack(token, updateOrderDataString(orderCode)).execute().body();
             case PACKED:
                 return repo.updateOrderStatusToReady(token,updateOrderDataString(orderCode)).execute().body();
             case NEED_SUPPLY:
+                if (isReturn) {
+                    return repo.updateOrderStatusToReturnSupplement(token, updateOrderDataString(orderCode)).execute().body();
+                }
                 return repo.updateOrderStatusToSupplement(token,updateOrderDataString(orderCode)).execute().body();
         }
         return null;
@@ -158,7 +164,7 @@ public class TsoftServiceImpl implements TsoftService {
     @Override
     public OrderLogSuccessModel getReturnedOrder(String token) throws IOException {
         OrderDataModel response = getOrderByStatus(token, "1206");
-        return handleOrderResponse(token,response);
+        return handleOrderResponse(token,true,response);
     }
 
     private OrderDataModel getOrderByStatus(String token, String statusId) throws IOException {
@@ -167,11 +173,11 @@ public class TsoftServiceImpl implements TsoftService {
         return repo.getOrders(token,statusId,true,1, tsoftSortQuery, tsoftSearchQuery).execute().body();
     }
 
-    private OrderLogSuccessModel handleOrderResponse(String token, OrderDataModel response) {
+    private OrderLogSuccessModel handleOrderResponse(String token, boolean isReturn, OrderDataModel response) {
         if (response != null) {
             if (response.data != null && response.data.size() > 0) {
                 for (OrderModel model : response.data) {
-                    OrderLogSuccessModel successModel = prepareTsoftOrder(token,model);
+                    OrderLogSuccessModel successModel = prepareTsoftOrder(token,isReturn,model);
                     if (successModel.success) {
                         return successModel;
                     }
@@ -184,7 +190,7 @@ public class TsoftServiceImpl implements TsoftService {
         throw new IllegalArgumentException();
     }
 
-    private OrderLogSuccessModel prepareTsoftOrder(String token, OrderModel orderModel) {
+    private OrderLogSuccessModel prepareTsoftOrder(String token, boolean isReturn, OrderModel orderModel) {
         Orders order = orderRepository.findByOrderCode(orderModel.OrderCode);
 
         refundCheck(orderModel);
@@ -250,7 +256,7 @@ public class TsoftServiceImpl implements TsoftService {
             }
 
 //            GenericTsoftResponseModel response = repo.updateOrderStatusToPack(token,updateOrderDataString(orderModel.OrderCode)).execute().body();
-            GenericTsoftResponseModel response = updateOrderStatus(token,orderModel.OrderCode,Orders.OrderStatusEnum.PACKING);
+            GenericTsoftResponseModel response = updateOrderStatus(token,isReturn,orderModel.OrderCode,Orders.OrderStatusEnum.PACKING);
             if (response != null && response.success) {
                 orderModel.DeliveryName = orderModel.DeliveryName + " - " + orderModel.Cargo;
                 return new OrderLogSuccessModel(true,"Başarılı",campaign,orderModel);

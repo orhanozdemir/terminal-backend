@@ -1,5 +1,6 @@
 package com.procsin.API.Service.Implementation.Pack;
 
+import com.procsin.API.DAO.Pack.Return.OrderDAO;
 import com.procsin.API.DAO.Pack.Return.ReturnedOrderDAO;
 import com.procsin.API.DAO.Pack.Return.ReturnedOrderLogDAO;
 import com.procsin.API.DAO.Pack.Return.ReturnedProductDAO;
@@ -7,12 +8,8 @@ import com.procsin.API.DAO.UserDao;
 import com.procsin.API.Model.ReturnOrderRequestModel;
 import com.procsin.API.Service.Interface.Pack.OrderService;
 import com.procsin.API.Service.Interface.Pack.ReturnedOrderService;
-import com.procsin.DB.Entity.Pack.Return.ReturnedOrder;
-import com.procsin.DB.Entity.Pack.Return.ReturnedOrderLog;
-import com.procsin.DB.Entity.Pack.Return.ReturnedOrderStatus;
-import com.procsin.DB.Entity.Pack.Return.ReturnedProduct;
+import com.procsin.DB.Entity.Pack.Return.*;
 import com.procsin.DB.Entity.UserManagement.User;
-import com.procsin.Retrofit.Models.TSoft.OrderModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,11 +25,11 @@ public class ReturnedOrderServiceImpl implements ReturnedOrderService {
     UserDao userRepository;
 
     @Autowired
+    OrderDAO orderDAO;
+    @Autowired
     ReturnedOrderDAO returnedOrderDAO;
-
     @Autowired
     ReturnedOrderLogDAO returnedOrderLogDAO;
-
     @Autowired
     ReturnedProductDAO returnedProductDAO;
 
@@ -46,16 +43,33 @@ public class ReturnedOrderServiceImpl implements ReturnedOrderService {
 
     @Override
     public ReturnedOrder createReturnedOrder(ReturnOrderRequestModel requestModel) {
-        ReturnedOrder returnedOrder = returnedOrderDAO.findByOrderCode(requestModel.orderModel.OrderCode);
+        PRSOrder order = orderDAO.findByOrderCode(requestModel.orderModel.OrderCode);
+        if (order == null) {
+            order = new PRSOrder(requestModel.orderModel, getActiveUser());
+            order = orderDAO.save(order);
+        }
+        ReturnedOrder returnedOrder = returnedOrderDAO.findByOrderAndIsCompleted(order,false);
         if (returnedOrder != null) {
             returnedOrder.productsDidReturn = true;
-            if (shouldChangeStatus(returnedOrder,ReturnedOrderStatus.MUSTERI_HIZMETLERI_BEKLENIYOR)) {
-                return updateReturnedOrder(returnedOrder.id, ReturnedOrderStatus.MUSTERI_HIZMETLERI_BEKLENIYOR,
-                        returnedOrder.description, returnedOrder.trackingCode);
-            }
+            returnedOrderDAO.save(returnedOrder);
+            return updateReturnedOrder(returnedOrder.id, ReturnedOrderStatus.MUSTERI_HIZMETLERI_BEKLENIYOR,
+                    returnedOrder.description, returnedOrder.trackingCode);
         }
         else {
-            returnedOrder  = new ReturnedOrder(requestModel.orderModel,getActiveUser());
+            returnedOrder  = new ReturnedOrder();
+            returnedOrder.order = order;
+            returnedOrder.status = ReturnedOrderStatus.MUSTERI_HIZMETLERI_BEKLENIYOR;
+            returnedOrder.description = "";
+            returnedOrder.trackingCode = "";
+            returnedOrder.createdAt = new Date();
+            returnedOrder.createdBy = getActiveUser();
+            returnedOrder.lastUpdatedAt = new Date();
+            returnedOrder.lastUpdatedBy = getActiveUser();
+            returnedOrder.productsDidReturn = true;
+            returnedOrder.manuallyCreated = false;
+            returnedOrder.newOrderCreated = false;
+            returnedOrder.isCompleted = false;
+
             returnedOrder = returnedOrderDAO.save(returnedOrder);
         }
         for (ReturnedProduct returnedProduct : requestModel.products) {
@@ -88,17 +102,12 @@ public class ReturnedOrderServiceImpl implements ReturnedOrderService {
             if (didUpdate) {
                 returnedOrder.lastUpdatedAt = new Date();
                 returnedOrder.lastUpdatedBy = getActiveUser();
+                createReturnedOrderLog(id, returnedOrder.status, returnedOrder.description);
             }
 
             return returnedOrderDAO.save(returnedOrder);
         }
         throw new IllegalArgumentException();
-    }
-
-    @Override
-    public ReturnedOrderLog changeReturnedOrderStatus(Long id, ReturnedOrderStatus status) {
-        updateReturnedOrder(id,status,null,null);
-        return createReturnedOrderLog(id,status);
     }
 
     @Override
@@ -110,8 +119,7 @@ public class ReturnedOrderServiceImpl implements ReturnedOrderService {
 
     @Override
     public List<ReturnedOrder> returnedOrdersByStatus(ReturnedOrderStatus status) {
-        List<ReturnedOrder> returnedOrders = returnedOrderDAO.findAllByStatus(status);
-        return returnedOrders;
+        return returnedOrderDAO.findAllByStatus(status);
     }
 
     @Override
@@ -121,40 +129,40 @@ public class ReturnedOrderServiceImpl implements ReturnedOrderService {
 
     @Override
     public void updateRequiredFields(String token) {
-        List<ReturnedOrder> orders = returnedOrderDAO.findAllByOrderTypeIsNull();
-        for (ReturnedOrder returnedOrder : orders) {
-                OrderModel temp = orderService.getSpecificOrder(token, returnedOrder.orderCode);
-                if (temp != null) {
-                    returnedOrder.orderType = temp.PaymentType;
-                    returnedOrder.orderAmount = temp.OrderTotalPrice;
-                    returnedOrderDAO.save(returnedOrder);
-                }
-        }
+//        List<ReturnedOrder> orders = returnedOrderDAO.findAllByOrderTypeIsNull();
+//        for (ReturnedOrder returnedOrder : orders) {
+//                OrderModel temp = orderService.getSpecificOrder(token, returnedOrder.orderCode);
+//                if (temp != null) {
+//                    returnedOrder.orderType = temp.PaymentType;
+//                    returnedOrder.orderAmount = temp.OrderTotalPrice;
+//                    returnedOrderDAO.save(returnedOrder);
+//                }
+//        }
     }
 
-    private boolean shouldChangeStatus(ReturnedOrder returnedOrder, ReturnedOrderStatus newStatus) {
-        boolean shouldChange = false;
+//    private boolean shouldChangeStatus(ReturnedOrder returnedOrder, ReturnedOrderStatus newStatus) {
+//        boolean shouldChange = false;
+//
+//        if (returnedOrder.isCompleted || newStatus.equals(ReturnedOrderStatus.MANUEL_OLUSTURULDU)) {
+//            return false;
+//        }
+//
+//        switch (returnedOrder.status) {
+//            case YENIDEN_CIKIS_BEKLENIYOR:
+//                if (newStatus.equals(ReturnedOrderStatus.YENIDEN_CIKIS_SAGLANDI))
+//                    shouldChange = true;
+//                break;
+//            case KISMI_GONDERIM_BEKLENIYOR:
+//                if (newStatus.equals(ReturnedOrderStatus.KISMI_GONDERIM_SAGLANDI))
+//                    shouldChange = true;
+//                break;
+//        }
+//        return shouldChange;
+//    }
 
-        if (returnedOrder.isCompleted || newStatus.equals(ReturnedOrderStatus.MANUEL_OLUSTURULDU)) {
-            return false;
-        }
-
-        switch (returnedOrder.status) {
-            case YENIDEN_CIKIS_BEKLENIYOR:
-                if (newStatus.equals(ReturnedOrderStatus.YENIDEN_CIKIS_SAGLANDI))
-                    shouldChange = true;
-                break;
-            case KISMI_GONDERIM_BEKLENIYOR:
-                if (newStatus.equals(ReturnedOrderStatus.KISMI_GONDERIM_SAGLANDI))
-                    shouldChange = true;
-                break;
-        }
-        return shouldChange;
-    }
-
-    private ReturnedOrderLog createReturnedOrderLog(Long id, ReturnedOrderStatus status) {
+    private ReturnedOrderLog createReturnedOrderLog(Long id, ReturnedOrderStatus status, String description) {
         ReturnedOrder returnedOrder = returnedOrderDAO.findById(id).isPresent() ? returnedOrderDAO.findById(id).get() : null;
-        ReturnedOrderLog log = new ReturnedOrderLog(returnedOrder,status,getActiveUser());
+        ReturnedOrderLog log = new ReturnedOrderLog(returnedOrder,getActiveUser(),status,description);
         return returnedOrderLogDAO.save(log);
     }
 

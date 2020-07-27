@@ -12,7 +12,6 @@ import java.util.List;
 public interface ReturnedOrderService {
     ReturnedOrder createReturnedOrder(ReturnOrderRequestModel requestModel);
     ReturnedOrder updateReturnedOrder(Long id, ReturnedOrderStatus status, String description, String trackingCode);
-    ReturnedOrderLog changeReturnedOrderStatus(Long id, ReturnedOrderStatus status);
 
     List<ReturnedOrder> allReturnedOrders();
     List<ReturnedOrder> returnedOrdersByStatus(ReturnedOrderStatus status);

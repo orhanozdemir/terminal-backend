@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "ReturnedOrderLog", schema = "sevk", catalog = "PRS_SEVK")
+@Table(name = "ReturnedOrderLog", schema = "panel", catalog = "PRS_SEVK")
 public class ReturnedOrderLog {
 
     @Id
@@ -14,21 +14,24 @@ public class ReturnedOrderLog {
     public Long id;
 
     @ManyToOne
-    public ReturnedOrder order;
+    public ReturnedOrder returnedOrder;
 
     @ManyToOne
     public User user;
 
     public ReturnedOrderStatus status;
 
+    public String updateNote;
+
     public Date createdAt;
 
     public ReturnedOrderLog() {}
 
-    public ReturnedOrderLog(ReturnedOrder order, ReturnedOrderStatus status, User user) {
-        this.order = order;
+    public ReturnedOrderLog(ReturnedOrder returnedOrder, User user, ReturnedOrderStatus status, String description) {
+        this.returnedOrder = returnedOrder;
         this.user = user;
         this.status = status;
+        this.updateNote = returnedOrder.order.orderCode + " - " + user.getUsername() + " durumu (" + status + "olarak güncelledi. Açıklama : " + description;
         this.createdAt = new Date();
     }
 }
