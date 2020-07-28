@@ -39,12 +39,18 @@ public class AuthenticationController {
                         loginModel.password
                 )
         );
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
         final String token = jwtTokenUtil.generateToken(authentication);
 
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = userService.findOne(userDetails.getUsername());
-        return ResponseEntity.ok(new AuthToken(token,user));
+        if (user.getActive()) {
+            return ResponseEntity.ok(new AuthToken(token,user));
+        }
+        else {
+            throw new IllegalArgumentException("Hatali");
+        }
     }
 
     @RequestMapping(value="/signup", method = RequestMethod.POST)
