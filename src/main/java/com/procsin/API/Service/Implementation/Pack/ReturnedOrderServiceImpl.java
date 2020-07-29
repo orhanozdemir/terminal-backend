@@ -10,6 +10,7 @@ import com.procsin.API.Service.Interface.Pack.OrderService;
 import com.procsin.API.Service.Interface.Pack.ReturnedOrderService;
 import com.procsin.DB.Entity.Pack.Return.*;
 import com.procsin.DB.Entity.UserManagement.User;
+import com.procsin.Retrofit.Models.TSoft.OrderModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -45,13 +46,13 @@ public class ReturnedOrderServiceImpl implements ReturnedOrderService {
     public ReturnedOrder createReturnedOrder(ReturnOrderRequestModel requestModel) {
         PRSOrder order = orderDAO.findByOrderCode(requestModel.orderModel.OrderCode);
         if (order == null) {
-            order = new PRSOrder(requestModel.orderModel, getActiveUser());
-            order = orderDAO.save(order);
+            order = createOrder(requestModel.orderModel, getActiveUser());
         }
         ReturnedOrder returnedOrder = returnedOrderDAO.findByOrderAndIsCompleted(order,false);
         if (returnedOrder != null) {
             returnedOrder.productsDidReturn = true;
             returnedOrderDAO.save(returnedOrder);
+            createReturnedProducts(requestModel.products, returnedOrder, getActiveUser());
             return updateReturnedOrder(returnedOrder.id, ReturnedOrderStatus.MUSTERI_HIZMETLERI_BEKLENIYOR,
                     returnedOrder.description, returnedOrder.trackingCode);
         }
@@ -72,12 +73,24 @@ public class ReturnedOrderServiceImpl implements ReturnedOrderService {
 
             returnedOrder = returnedOrderDAO.save(returnedOrder);
         }
-        for (ReturnedProduct returnedProduct : requestModel.products) {
-            returnedProduct.returnedOrder = returnedOrder;
-            returnedProductDAO.save(returnedProduct);
-        }
+
+        createReturnedProducts(requestModel.products, returnedOrder, getActiveUser());
 
         return returnedOrder;
+    }
+
+    private PRSOrder createOrder(OrderModel orderModel, User user) {
+        PRSOrder order = new PRSOrder(orderModel, user);
+        return orderDAO.save(order);
+    }
+
+    private void createReturnedProducts(List<ReturnedProduct> returnedProducts, ReturnedOrder returnedOrder, User user) {
+        for (ReturnedProduct returnedProduct : returnedProducts) {
+            returnedProduct.returnedOrder = returnedOrder;
+            returnedProduct.createdAt = new Date();
+            returnedProduct.createdBy = user;
+            returnedProductDAO.save(returnedProduct);
+        }
     }
 
     @Override

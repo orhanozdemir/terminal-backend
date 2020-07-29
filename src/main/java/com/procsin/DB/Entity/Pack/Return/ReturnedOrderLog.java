@@ -31,7 +31,7 @@ public class ReturnedOrderLog {
         this.returnedOrder = returnedOrder;
         this.user = user;
         this.status = status;
-        this.updateNote = returnedOrder.order.orderCode + " - " + user.getUsername() + " durumu (" + status + "olarak güncelledi. Açıklama : " + description;
+        this.updateNote = returnedOrder.order.orderCode + " - " + user.getUsername() + " durumu (" + status + ") olarak güncelledi. Açıklama : " + description;
         this.createdAt = new Date();
     }
 }
