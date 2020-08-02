@@ -14,7 +14,7 @@ public class CreatedOrder {
     public Long id;
 
     @ManyToOne
-    public ReturnedOrder returnedOrder;
+    public PRSOrder order;
 
     public String newOrderCode;
 
