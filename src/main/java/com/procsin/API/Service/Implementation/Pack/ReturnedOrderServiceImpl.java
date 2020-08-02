@@ -1,6 +1,6 @@
 package com.procsin.API.Service.Implementation.Pack;
 
-import com.procsin.API.DAO.Pack.Return.OrderDAO;
+import com.procsin.API.DAO.Pack.Return.PRSOrderDAO;
 import com.procsin.API.DAO.Pack.Return.ReturnedOrderDAO;
 import com.procsin.API.DAO.Pack.Return.ReturnedOrderLogDAO;
 import com.procsin.API.DAO.Pack.Return.ReturnedProductDAO;
@@ -26,7 +26,7 @@ public class ReturnedOrderServiceImpl implements ReturnedOrderService {
     UserDao userRepository;
 
     @Autowired
-    OrderDAO orderDAO;
+    PRSOrderDAO PRSOrderDAO;
     @Autowired
     ReturnedOrderDAO returnedOrderDAO;
     @Autowired
@@ -44,7 +44,7 @@ public class ReturnedOrderServiceImpl implements ReturnedOrderService {
 
     @Override
     public ReturnedOrder createReturnedOrder(ReturnOrderRequestModel requestModel) {
-        PRSOrder order = orderDAO.findByOrderCode(requestModel.orderModel.OrderCode);
+        PRSOrder order = PRSOrderDAO.findByOrderCode(requestModel.orderModel.OrderCode);
         if (order == null) {
             order = createOrder(requestModel.orderModel, getActiveUser());
         }
@@ -81,7 +81,7 @@ public class ReturnedOrderServiceImpl implements ReturnedOrderService {
 
     private PRSOrder createOrder(OrderModel orderModel, User user) {
         PRSOrder order = new PRSOrder(orderModel, user);
-        return orderDAO.save(order);
+        return PRSOrderDAO.save(order);
     }
 
     private void createReturnedProducts(List<ReturnedProduct> returnedProducts, ReturnedOrder returnedOrder, User user) {

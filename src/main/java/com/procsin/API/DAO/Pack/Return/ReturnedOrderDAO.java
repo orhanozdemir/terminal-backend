@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface ReturnedOrderDAO extends CrudRepository<ReturnedOrder,Long> {
-    ReturnedOrder findByOrderAndIsCompleted(PRSOrder order, Boolean isCompleted);
+    ReturnedOrder findByOrderAndIsCompleted(PRSOrder prsOrder, Boolean isCompleted);
     List<ReturnedOrder> findAllByStatus(ReturnedOrderStatus status);
 }
