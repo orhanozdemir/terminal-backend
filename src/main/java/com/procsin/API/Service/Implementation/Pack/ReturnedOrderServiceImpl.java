@@ -73,9 +73,8 @@ public class ReturnedOrderServiceImpl implements ReturnedOrderService {
 
             returnedOrder = returnedOrderDAO.save(returnedOrder);
         }
-
+        updateReturnedOrder(returnedOrder.id, ReturnedOrderStatus.MUSTERI_HIZMETLERI_BEKLENIYOR, null, null);
         createReturnedProducts(requestModel.products, returnedOrder, getActiveUser());
-
         return returnedOrder;
     }
 
@@ -175,6 +174,9 @@ public class ReturnedOrderServiceImpl implements ReturnedOrderService {
 
     private ReturnedOrderLog createReturnedOrderLog(Long id, ReturnedOrderStatus status, String description) {
         ReturnedOrder returnedOrder = returnedOrderDAO.findById(id).isPresent() ? returnedOrderDAO.findById(id).get() : null;
+        if (returnedOrder == null) {
+            throw new IllegalArgumentException();
+        }
         ReturnedOrderLog log = new ReturnedOrderLog(returnedOrder,getActiveUser(),status,description);
         return returnedOrderLogDAO.save(log);
     }
