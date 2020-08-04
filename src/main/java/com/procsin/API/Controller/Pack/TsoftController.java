@@ -40,16 +40,16 @@ public class TsoftController {
     }
 
     @RequestMapping(value = "/updateSupplement", method = RequestMethod.POST)
-    GenericResponse updateToSupplement(@RequestParam(required = false) String token, @RequestParam String orderCode) {
-        return orderService.updateToSupplement(token, orderCode);
+    GenericResponse updateToSupplement(@RequestParam(required = false) String token, @RequestParam(required = false) boolean isReturn, @RequestParam String orderCode) {
+        return orderService.updateToSupplement(token, isReturn, orderCode);
     }
     @RequestMapping(value = "/finish", method = RequestMethod.POST)
     GenericResponse finishOrder(@RequestParam(required = false) String token, @RequestParam String orderCode) {
         return orderService.finishOrder(token, orderCode);
     }
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
-    GenericResponse cancelOrder(@RequestParam(required = false) String token, @RequestParam String orderCode) {
-        return orderService.cancelOrder(token, orderCode);
+    GenericResponse cancelOrder(@RequestParam(required = false) String token, @RequestParam(required = false) boolean isReturn, @RequestParam String orderCode) {
+        return orderService.cancelOrder(token,isReturn,orderCode);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,12 +64,11 @@ public class TsoftController {
         List<ReturnedOrder> returnedOrders = returnedOrderService.returnedOrdersByStatus(ReturnedOrderStatus.YENIDEN_CIKIS_BEKLENIYOR);
         for (ReturnedOrder returnedOrder : returnedOrders) {
             if (!returnedOrder.newOrderCreated) {
-                tsoftService.createOrder(token,returnedOrder.orderCode);
+                tsoftService.createOrder(token,returnedOrder.order.orderCode);
             }
         }
         return new GenericResponse(true,"Başarılı");
     }
-
 
     @RequestMapping(value = "/getReturnedOrder", method = RequestMethod.GET)
     OrderLogSuccessModel getReturnedOrder(@RequestParam(required = false) String token) {

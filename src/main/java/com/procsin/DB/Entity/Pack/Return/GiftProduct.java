@@ -6,26 +6,23 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "ReturnedProduct", schema = "panel", catalog = "PRS_SEVK")
-public class ReturnedProduct {
+@Table(name = "GiftProduct", schema = "panel", catalog = "PRS_SEVK")
+public class GiftProduct {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     public Long id;
 
     @ManyToOne
-    public ReturnedOrder returnedOrder;
+    public Gift gift;
 
     public String productCode;
     public String productName;
-
-    public int stableQuantity;
-    public int damagedQuantity;
-    public int totalQuantity;
+    public int quantity;
 
     public Date createdAt;
     @ManyToOne
     public User createdBy;
 
-    public ReturnedProduct() {}
+    public GiftProduct() {}
 }

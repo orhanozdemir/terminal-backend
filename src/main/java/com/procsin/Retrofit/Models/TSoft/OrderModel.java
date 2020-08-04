@@ -11,6 +11,8 @@ import java.util.List;
 
 public class OrderModel {
     public String OrderCode;
+    public String CustomerCode;
+    public String CustomerUsername;
     public String DeliveryName;
     public String DeliveryAddress;
     public String Cargo;
@@ -24,7 +26,6 @@ public class OrderModel {
 
     public List<ProductModel> OrderDetails;
 
-    public String CustomerCode;
     public int PaymentTypeId;
     public String InvoiceAddressId;
     public String DeliveryAddressId;

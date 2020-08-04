@@ -9,8 +9,8 @@ public interface OrderService {
     OrderLogSuccessModel getSingleOrder(String token, boolean isTrendyol);
     OrderModel getSpecificOrder(String token, String orderCode);
     GenericResponse finishOrder(String token, String orderCode);
-    GenericResponse updateToSupplement(String token, String orderCode);
-    GenericResponse cancelOrder(String token, String orderCode);
+    GenericResponse updateToSupplement(String token, boolean isReturn, String orderCode);
+    GenericResponse cancelOrder(String token, boolean isReturn, String orderCode);
 
     OrderLogSuccessModel getReturnedOrder(String token);
 
