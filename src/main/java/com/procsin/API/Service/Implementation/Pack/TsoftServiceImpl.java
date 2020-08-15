@@ -32,8 +32,7 @@ import javax.persistence.EntityManager;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -102,11 +101,22 @@ public class TsoftServiceImpl implements TsoftService {
                 response = repo.getSingleOrder(token,true,orderCode,"1").execute().body();
             }
             if (response != null && response.data != null && response.data.size() > 0) {
+                sortProductArray(response.data.get(0));
                 return response.data.get(0);
             }
         }
+
         System.out.println(orderCode);
         throw new IllegalArgumentException();
+    }
+
+    void sortProductArray(OrderModel model) {
+        Collections.sort(model.OrderDetails, new Comparator<ProductModel>() {
+            @Override
+            public int compare(ProductModel o1, ProductModel o2) {
+                return o1.ProductCode.compareTo(o2.ProductCode);
+            }
+        });
     }
 
     @Override
@@ -177,6 +187,7 @@ public class TsoftServiceImpl implements TsoftService {
         if (response != null) {
             if (response.data != null && response.data.size() > 0) {
                 for (OrderModel model : response.data) {
+                    sortProductArray(model);
                     OrderLogSuccessModel successModel = prepareTsoftOrder(token,isReturn,model);
                     if (successModel.success) {
                         return successModel;
