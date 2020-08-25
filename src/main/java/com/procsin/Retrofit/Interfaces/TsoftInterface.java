@@ -41,11 +41,11 @@ public interface TsoftInterface {
     Call<GenericTsoftResponseModel> updateOrderStatusToPreparing(@Field("token") String token, @Field("data") String data);
 
     @FormUrlEncoded
-    @POST("order2/updateOrderStatusAs/???")
+    @POST("order2/updateOrderStatusAs/1208")
     Call<GenericTsoftResponseModel> updateOrderStatusToReturnSupplement(@Field("token") String token, @Field("data") String data);
 
     @FormUrlEncoded
-    @POST("order2/updateOrderStatusAs/???")
+    @POST("order2/updateOrderStatusAs/1206")
     Call<GenericTsoftResponseModel> updateOrderStatusToReturnPreparing(@Field("token") String token, @Field("data") String data);
 
     @FormUrlEncoded

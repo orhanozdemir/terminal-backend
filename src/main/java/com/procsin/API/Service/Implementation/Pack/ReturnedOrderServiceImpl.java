@@ -1,9 +1,6 @@
 package com.procsin.API.Service.Implementation.Pack;
 
-import com.procsin.API.DAO.Pack.Return.PRSOrderDAO;
-import com.procsin.API.DAO.Pack.Return.ReturnedOrderDAO;
-import com.procsin.API.DAO.Pack.Return.ReturnedOrderLogDAO;
-import com.procsin.API.DAO.Pack.Return.ReturnedProductDAO;
+import com.procsin.API.DAO.Pack.Return.*;
 import com.procsin.API.DAO.UserDao;
 import com.procsin.API.Model.ReturnOrderRequestModel;
 import com.procsin.API.Service.Interface.Pack.OrderService;
@@ -33,7 +30,8 @@ public class ReturnedOrderServiceImpl implements ReturnedOrderService {
     ReturnedOrderLogDAO returnedOrderLogDAO;
     @Autowired
     ReturnedProductDAO returnedProductDAO;
-
+    @Autowired
+    CreatedOrderDAO createdOrderDAO;
     @Autowired
     OrderService orderService;
 
@@ -99,6 +97,9 @@ public class ReturnedOrderServiceImpl implements ReturnedOrderService {
             boolean didUpdate = false;
             if (status != null) {
                 returnedOrder.status = status;
+                if (status == ReturnedOrderStatus.YENIDEN_CIKIS_SAGLANDI || status == ReturnedOrderStatus.KISMI_GONDERIM_SAGLANDI) {
+                    returnedOrder.isCompleted = true;
+                }
                 didUpdate = true;
             }
             if (description != null) {
@@ -154,8 +155,8 @@ public class ReturnedOrderServiceImpl implements ReturnedOrderService {
 
     @Override
     public ReturnedOrder findReturnedOrder(String orderCode) {
-        PRSOrder prsOrder = PRSOrderDAO.findByOrderCode(orderCode);
-        return returnedOrderDAO.findByOrderAndIsCompleted(prsOrder, false);
+        CreatedOrder createdOrder = createdOrderDAO.findByNewOrderCode(orderCode);
+        return returnedOrderDAO.findByOrderAndIsCompleted(createdOrder.order, false);
     }
 
     private ReturnedOrderLog createReturnedOrderLog(Long id, ReturnedOrderStatus status, String description) {
