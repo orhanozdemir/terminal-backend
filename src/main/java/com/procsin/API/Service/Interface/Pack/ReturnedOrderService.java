@@ -17,5 +17,7 @@ public interface ReturnedOrderService {
     List<ReturnedOrder> returnedOrdersByStatus(ReturnedOrderStatus status);
     List<ReturnedOrder> waitingReturnedOrders();
 
+    ReturnedOrder findReturnedOrder(String orderCode);
+
     void updateRequiredFields(String token);
 }

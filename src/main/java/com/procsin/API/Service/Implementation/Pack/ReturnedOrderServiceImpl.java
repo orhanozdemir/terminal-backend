@@ -152,25 +152,11 @@ public class ReturnedOrderServiceImpl implements ReturnedOrderService {
 //        }
     }
 
-//    private boolean shouldChangeStatus(ReturnedOrder returnedOrder, ReturnedOrderStatus newStatus) {
-//        boolean shouldChange = false;
-//
-//        if (returnedOrder.isCompleted || newStatus.equals(ReturnedOrderStatus.MANUEL_OLUSTURULDU)) {
-//            return false;
-//        }
-//
-//        switch (returnedOrder.status) {
-//            case YENIDEN_CIKIS_BEKLENIYOR:
-//                if (newStatus.equals(ReturnedOrderStatus.YENIDEN_CIKIS_SAGLANDI))
-//                    shouldChange = true;
-//                break;
-//            case KISMI_GONDERIM_BEKLENIYOR:
-//                if (newStatus.equals(ReturnedOrderStatus.KISMI_GONDERIM_SAGLANDI))
-//                    shouldChange = true;
-//                break;
-//        }
-//        return shouldChange;
-//    }
+    @Override
+    public ReturnedOrder findReturnedOrder(String orderCode) {
+        PRSOrder prsOrder = PRSOrderDAO.findByOrderCode(orderCode);
+        return returnedOrderDAO.findByOrderAndIsCompleted(prsOrder, false);
+    }
 
     private ReturnedOrderLog createReturnedOrderLog(Long id, ReturnedOrderStatus status, String description) {
         ReturnedOrder returnedOrder = returnedOrderDAO.findById(id).isPresent() ? returnedOrderDAO.findById(id).get() : null;
