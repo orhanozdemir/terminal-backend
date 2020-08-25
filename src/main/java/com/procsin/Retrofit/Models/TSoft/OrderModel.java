@@ -37,12 +37,10 @@ public class OrderModel {
     public String InvoiceCity;
     public String InvoiceTown;
     public String InvoiceAddress;
-//    public String DeliveryName;
     public String DeliveryMobile;
     public String DeliveryCountry;
     public String DeliveryCity;
     public String DeliveryTown;
-//    public String DeliveryAddress;
 
     @Expose
     public double totalCost;

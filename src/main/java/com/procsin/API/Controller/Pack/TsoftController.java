@@ -44,8 +44,8 @@ public class TsoftController {
         return orderService.updateToSupplement(token, isReturn, orderCode);
     }
     @RequestMapping(value = "/finish", method = RequestMethod.POST)
-    GenericResponse finishOrder(@RequestParam(required = false) String token, @RequestParam String orderCode) {
-        return orderService.finishOrder(token, orderCode);
+    GenericResponse finishOrder(@RequestParam(required = false) String token, @RequestParam(required = false) boolean isReturn, @RequestParam String orderCode) {
+        return orderService.finishOrder(token, isReturn, orderCode);
     }
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
     GenericResponse cancelOrder(@RequestParam(required = false) String token, @RequestParam(required = false) boolean isReturn, @RequestParam String orderCode) {

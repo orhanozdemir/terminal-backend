@@ -11,6 +11,8 @@ import com.procsin.API.Service.Interface.Pack.*;
 import com.procsin.DB.Entity.ErrorLog;
 import com.procsin.DB.Entity.Pack.OrderLog;
 import com.procsin.DB.Entity.Pack.Orders;
+import com.procsin.DB.Entity.Pack.Return.ReturnedOrder;
+import com.procsin.DB.Entity.Pack.Return.ReturnedOrderStatus;
 import com.procsin.DB.Entity.UserManagement.User;
 import com.procsin.Retrofit.Models.TSoft.OrderModel;
 import com.procsin.Retrofit.Models.TSoft.ProductModel;
@@ -41,6 +43,8 @@ public class OrderServiceImpl implements OrderService {
     OrderLogService orderLogService;
     @Autowired
     IISService iisService;
+    @Autowired
+    ReturnedOrderService returnedOrderService;
 
     private User getActiveUser() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -88,7 +92,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public GenericResponse finishOrder(String token, String orderCode) {
+    public GenericResponse finishOrder(String token, boolean isReturn, String orderCode) {
         boolean isTrendyol = orderCode.startsWith("TY");
         if (isPackedBefore(orderCode)) {
             String errorMessage = "Bu sipariş daha önce tamamlanmış";
@@ -115,7 +119,13 @@ public class OrderServiceImpl implements OrderService {
                     }
                 }
                 orderLogService.createOrderLog(order,OrderLog.OrderStatus.KARGO_HAZIR);
-                iisService.createInvoice(orderCode);
+                if (!isReturn) {
+                    iisService.createInvoice(orderCode);
+                }
+                else {
+                    ReturnedOrder returnedOrder = returnedOrderService.findReturnedOrder(orderCode);
+                    returnedOrderService.updateReturnedOrder(returnedOrder.id, ReturnedOrderStatus.YENIDEN_CIKIS_SAGLANDI,null,null);
+                }
                 return new GenericResponse(true,"Başarılı");
             } catch (IOException e) {
                 e.printStackTrace();
