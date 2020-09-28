@@ -8,12 +8,11 @@ import com.procsin.API.Service.Interface.Pack.TsoftService;
 import com.procsin.DB.Entity.Pack.Return.ReturnedOrder;
 import com.procsin.DB.Entity.Pack.Return.ReturnedOrderStatus;
 import com.procsin.Retrofit.Models.TSoft.OrderModel;
+import com.procsin.Retrofit.Models.TSoft.ProductModel;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -73,5 +72,12 @@ public class TsoftController {
     @RequestMapping(value = "/getReturnedOrder", method = RequestMethod.GET)
     OrderLogSuccessModel getReturnedOrder(@RequestParam(required = false) String token) {
         return orderService.getReturnedOrder(token);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @RequestMapping(value = "/supplementAll", method = RequestMethod.POST)
+    GenericResponse changeAllToSupplement(@RequestBody List<String> productCodes) throws IOException {
+        return tsoftService.changeAllToSupplement(productCodes);
     }
 }

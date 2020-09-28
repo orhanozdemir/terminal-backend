@@ -6,8 +6,10 @@ import com.procsin.API.Model.TSOFT.GenericTsoftResponseModel;
 import com.procsin.API.Model.TSOFT.LoginResponseDataModel;
 import com.procsin.DB.Entity.Pack.Orders;
 import com.procsin.Retrofit.Models.TSoft.OrderModel;
+import com.procsin.Retrofit.Models.TSoft.ProductModel;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface TsoftService {
 
@@ -18,4 +20,5 @@ public interface TsoftService {
     GenericResponse createOrder(String token, String orderCode);
     OrderLogSuccessModel getReturnedOrder(String token) throws IOException;
 
+    GenericResponse changeAllToSupplement(List<String> productModels) throws IOException;
 }
