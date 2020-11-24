@@ -268,7 +268,7 @@ public class TsoftServiceImpl implements TsoftService {
         try {
             orderLogService.createOrderLog(order,OrderLog.OrderStatus.URUN_PAKETLENIYOR);
 
-            Date date = new Date((orderModel.OrderDateTimeStamp + 10800) * 1000);
+            Date date = new Date((orderModel.OrderDateTimeStamp) * 1000);
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             String orderDate = dateFormat.format(date);
 
