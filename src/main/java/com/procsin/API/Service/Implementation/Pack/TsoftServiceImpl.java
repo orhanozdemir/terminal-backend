@@ -20,6 +20,7 @@ import com.procsin.Retrofit.Interfaces.TsoftInterface;
 import com.procsin.Retrofit.Models.TSoft.OrderDataModel;
 import com.procsin.Retrofit.Models.TSoft.OrderModel;
 import com.procsin.Retrofit.Models.TSoft.ProductModel;
+import com.procsin.Retrofit.Models.TSoft.StatusEnum;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,8 +88,8 @@ public class TsoftServiceImpl implements TsoftService {
     }
 
     @Override
-    public OrderLogSuccessModel getTSoftOrder(String token) throws IOException {
-        OrderDataModel response = getOrderByStatus(token, "1204");
+    public OrderLogSuccessModel getTSoftOrder(String token, boolean isTrendyol) throws IOException {
+        OrderDataModel response = getOrderByStatus(token, StatusEnum.URUN_HAZIRLANIYOR, isTrendyol);
         return handleOrderResponse(token,false,response);
     }
 
@@ -173,14 +174,14 @@ public class TsoftServiceImpl implements TsoftService {
 
     @Override
     public OrderLogSuccessModel getReturnedOrder(String token) throws IOException {
-        OrderDataModel response = getOrderByStatus(token, "1206");
+        OrderDataModel response = getOrderByStatus(token, StatusEnum.CIKIS_BEKLENIYOR, false);
         return handleOrderResponse(token,true,response);
     }
 
-    private OrderDataModel getOrderByStatus(String token, String statusId) throws IOException {
-        String tsoftSearchQuery = "OrderCode | TS | startswith";
-        String tsoftSortQuery = "OrderDateTimeStamp ASC";
-        return repo.getOrders(token,statusId,true,1, tsoftSortQuery, tsoftSearchQuery).execute().body();
+    private OrderDataModel getOrderByStatus(String token, StatusEnum status, boolean isTrendyol) throws IOException {
+        String searchQuery = "OrderCode | " + (isTrendyol ? "TY" : "TS") + " | startswith";
+        String sortQuery = "OrderDateTimeStamp ASC";
+        return repo.getOrders(token,status.statusId,true,1, sortQuery, searchQuery).execute().body();
     }
 
     private OrderLogSuccessModel handleOrderResponse(String token, boolean isReturn, OrderDataModel response) {

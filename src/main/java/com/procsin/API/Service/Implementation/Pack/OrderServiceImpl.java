@@ -16,6 +16,7 @@ import com.procsin.DB.Entity.Pack.Return.ReturnedOrderStatus;
 import com.procsin.DB.Entity.UserManagement.User;
 import com.procsin.Retrofit.Models.TSoft.OrderModel;
 import com.procsin.Retrofit.Models.TSoft.ProductModel;
+import com.procsin.Retrofit.Models.TSoft.StatusEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,8 +36,6 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderLogDao orderLogDao;
 
-    @Autowired
-    TrendyolService trendyolService;
     @Autowired
     TsoftService tsoftService;
     @Autowired
@@ -62,13 +61,7 @@ public class OrderServiceImpl implements OrderService {
             if (token == null) {
                 token = tsoftService.getTsoftToken();
             }
-            if (isTrendyol) {
-                return trendyolService.getOrder();
-            }
-            else {
-                return tsoftService.getTSoftOrder(token);
-            }
-
+            return tsoftService.getTSoftOrder(token,isTrendyol);
         } catch (IOException e) {
             throw new IllegalArgumentException();
         }
@@ -138,7 +131,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public GenericResponse updateToSupplement(String token, boolean isReturn, String orderCode) {
-        boolean isTrendyol = orderCode.startsWith("TY");
         Orders order = orderDao.findByOrderCode(orderCode);
         if (order == null) {
             String errorCode = "Order-1003";
@@ -153,14 +145,12 @@ public class OrderServiceImpl implements OrderService {
             throw new IllegalStateException(errorMessage);
         }
         try {
-            if (!isTrendyol) {
-                if (token == null) {
-                    token = tsoftService.getTsoftToken();
-                }
-                GenericTsoftResponseModel response = tsoftService.updateOrderStatus(token,isReturn, orderCode, Orders.OrderStatusEnum.NEED_SUPPLY);
-                if (response == null || !response.success) {
-                    throw new IllegalStateException("-");
-                }
+            if (token == null) {
+                token = tsoftService.getTsoftToken();
+            }
+            GenericTsoftResponseModel response = tsoftService.updateOrderStatus(token,isReturn, orderCode, Orders.OrderStatusEnum.NEED_SUPPLY);
+            if (response == null || !response.success) {
+                throw new IllegalStateException("-");
             }
             orderLogService.createOrderLog(order,OrderLog.OrderStatus.TEDARIK_SURECINDE);
             return new GenericResponse(true,"Başarılı");
@@ -192,7 +182,7 @@ public class OrderServiceImpl implements OrderService {
                     token = tsoftService.getTsoftToken();
                 }
                 OrderModel temp = getSpecificOrder(token, orderCode);
-                if (temp.OrderStatusId.equals("1202")) {
+                if (temp.OrderStatusId.equals(StatusEnum.URUN_PAKETLENIYOR.statusId)) {
                     GenericTsoftResponseModel response = tsoftService.updateOrderStatus(token,isReturn,orderCode, Orders.OrderStatusEnum.CANCELED);
                     if (response == null || !response.success) {
                         String errorCode = "Order-1010";
