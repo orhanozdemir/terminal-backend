@@ -229,7 +229,7 @@ public class TsoftServiceImpl implements TsoftService {
     private OrderDataModel getOrderByStatus(String token, StatusEnum status, boolean isTrendyol) throws IOException {
         String searchQuery = "OrderCode | " + (isTrendyol ? "TY" : "TS") + " | startswith";
         String sortQuery = "OrderDateTimeStamp ASC";
-        return repo.getOrders(token,status.statusId,true,1, sortQuery, searchQuery).execute().body();
+        return repo.getOrders(token,status.statusId,true,1,0, sortQuery, searchQuery).execute().body();
     }
 
     private OrderLogSuccessModel handleOrderResponse(String token, boolean isReturn, OrderDataModel response) {
