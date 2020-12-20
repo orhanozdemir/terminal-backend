@@ -178,6 +178,54 @@ public class TsoftServiceImpl implements TsoftService {
         return handleOrderResponse(token,true,response);
     }
 
+    @Override
+    public GenericResponse changeAllToSupplement(List<String> productCodes) throws IOException {
+        List<OrderModel> allOrders = getAllWaitingOrders();
+        List<String> suppOrderCodes = new ArrayList<>();
+        for (OrderModel order : allOrders) {
+            List<ProductModel> products = order.OrderDetails;
+            for (ProductModel product : products) {
+                if (productCodes.contains(product.ProductCode)) {
+                    suppOrderCodes.add(order.OrderCode);
+                    break;
+                }
+            }
+        }
+
+        String data = "[";
+        for (String temp : suppOrderCodes) {
+            data += "{\"OrderCode\":\"" + temp + "\"},";
+        }
+        data = data.substring(0, data.length() - 1);
+        data += "]";
+
+        repo.updateOrderStatusToSupplement(getTsoftToken(),data);
+        return new GenericResponse(true, "Başarılı");
+    }
+
+    private List<OrderModel> getAllWaitingOrders() throws IOException {
+        String token = getTsoftToken();
+        List<OrderModel> allOrders = new ArrayList<>();
+        String tsoftSearchQuery = "OrderCode | TS | startswith";
+        int limit = 500;
+        String tsoftSortQuery = "OrderDateTimeStamp ASC";
+        OrderDataModel response = repo.getOrders(token,"1204",true,limit,
+                0, tsoftSortQuery, tsoftSearchQuery).execute().body();
+
+        if(response != null) {
+            allOrders.addAll(response.data);
+            int totalOrderCount = response.summary.totalRecordCount;
+            int totalPage = (totalOrderCount%limit == 0) ? (totalOrderCount / limit) : (totalOrderCount / limit + 1);
+            for (int i = 1; i < totalPage; i++) {
+                OrderDataModel temp = repo.getOrders(token, "1204", true, limit,
+                        limit*i, tsoftSortQuery, tsoftSearchQuery).execute().body();
+                allOrders.addAll(temp.data);
+            }
+        }
+
+        return allOrders;
+    }
+  
     private OrderDataModel getOrderByStatus(String token, StatusEnum status, boolean isTrendyol) throws IOException {
         String searchQuery = "OrderCode | " + (isTrendyol ? "TY" : "TS") + " | startswith";
         String sortQuery = "OrderDateTimeStamp ASC";
@@ -221,7 +269,7 @@ public class TsoftServiceImpl implements TsoftService {
         try {
             orderLogService.createOrderLog(order,OrderLog.OrderStatus.URUN_PAKETLENIYOR);
 
-            Date date = new Date((orderModel.OrderDateTimeStamp + 10800) * 1000);
+            Date date = new Date((orderModel.OrderDateTimeStamp) * 1000);
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             String orderDate = dateFormat.format(date);
 
