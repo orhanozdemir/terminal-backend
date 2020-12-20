@@ -14,7 +14,7 @@ import java.util.List;
 public interface TsoftService {
 
     String getTsoftToken() throws IOException;
-    OrderLogSuccessModel getTSoftOrder(String token) throws IOException;
+    OrderLogSuccessModel getTSoftOrder(String token, boolean isTrendyol) throws IOException;
     OrderModel getSingleOrder(String token, String orderCode) throws IOException;
     GenericTsoftResponseModel updateOrderStatus(String token, boolean isReturn, String orderCode, Orders.OrderStatusEnum status) throws IOException;
     GenericResponse createOrder(String token, String orderCode);
