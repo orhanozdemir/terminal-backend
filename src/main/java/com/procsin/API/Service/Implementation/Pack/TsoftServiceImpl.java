@@ -179,27 +179,82 @@ public class TsoftServiceImpl implements TsoftService {
     }
 
     @Override
-    public GenericResponse changeAllToSupplement(List<String> productCodes) throws IOException {
-        List<OrderModel> allOrders = getAllWaitingOrders();
-        List<String> suppOrderCodes = new ArrayList<>();
-        for (OrderModel order : allOrders) {
-            List<ProductModel> products = order.OrderDetails;
-            for (ProductModel product : products) {
-                if (productCodes.contains(product.ProductCode)) {
-                    suppOrderCodes.add(order.OrderCode);
-                    break;
-                }
+    public List<OrderModel> getAllOrdersByStatus(StatusEnum status) throws IOException {
+        String token = getTsoftToken();
+        List<OrderModel> allOrders = new ArrayList<>();
+        String tsoftSearchQuery = "OrderCode | TS | startswith";
+        int limit = 500;
+        String tsoftSortQuery = "OrderDateTimeStamp ASC";
+        OrderDataModel response = repo.getOrders(token,status.statusId,true,limit,
+                0, tsoftSortQuery, tsoftSearchQuery).execute().body();
+        if(response != null) {
+            allOrders.addAll(response.data);
+            int totalOrderCount = response.summary.totalRecordCount;
+            int totalPage = (totalOrderCount%limit == 0) ? (totalOrderCount / limit) : (totalOrderCount / limit + 1);
+            for (int i = 1; i < totalPage; i++) {
+                OrderDataModel temp = repo.getOrders(token, status.statusId, true, limit,
+                        limit*i, tsoftSortQuery, tsoftSearchQuery).execute().body();
+                if(temp != null)
+                    allOrders.addAll(temp.data);
             }
         }
+        return allOrders;
+    }
 
-        String data = "[";
-        for (String temp : suppOrderCodes) {
-            data += "{\"OrderCode\":\"" + temp + "\"},";
+    @Override
+    public List<OrderModel> filterOrdersByProducts(List<OrderModel> orders, List<String> withProducts, List<String> withoutProducts) {
+        List<OrderModel> filteredOrders = new ArrayList<>();
+        for (OrderModel order : orders) {
+            boolean wantedFlag = false;
+            boolean unwantedFlag = false;
+            for (ProductModel product : order.OrderDetails) {
+                if (withoutProducts.contains(product.ProductCode)) {
+                    unwantedFlag = true;
+                    break;
+                }
+                if (withProducts.size() == 0 || withProducts.contains(product.ProductCode)) {
+                    wantedFlag = true;
+                }
+            }
+            if (wantedFlag && !unwantedFlag) {
+                filteredOrders.add(order);
+            }
         }
-        data = data.substring(0, data.length() - 1);
-        data += "]";
+        return filteredOrders;
+    }
 
-        repo.updateOrderStatusToSupplement(getTsoftToken(),data);
+    @Override
+    public GenericResponse updateStatuses(List<OrderModel> orders, StatusEnum newStatus) throws IOException {
+        int period = 50;
+        int pageCount = (orders.size() % period) == 0 ? (orders.size() / period) : (orders.size() / period + 1);
+        String token = getTsoftToken();
+        for (int i = 0; i < pageCount; i++) {
+            int startIndex = i * period;
+            int endIndex = Math.min((startIndex + period), orders.size());
+            List<OrderModel> tempOrders = orders.subList(startIndex, endIndex);
+            String data = "[";
+            for (OrderModel temp : tempOrders) {
+                data += "{\"OrderCode\":\"" + temp.OrderCode + "\"},";
+            }
+            data = data.substring(0, data.length() - 1);
+            data += "]";
+            switch (newStatus) {
+                case URUN_HAZIRLANIYOR:
+                    repo.updateOrderStatusToPreparing(token,data);
+                    break;
+                case TEDARIK_SURECINDE:
+                    repo.updateOrderStatusToSupplement(token,data);
+                    break;
+                case CIKIS_BEKLENIYOR:
+                    repo.updateOrderStatusToReturnPreparing(token,data);
+                    break;
+                case YENIDEN_CIKIS_TEDARIK:
+                    repo.updateOrderStatusToReturnSupplement(token,data);
+                    break;
+                default:
+                    break;
+            }
+        }
         return new GenericResponse(true, "Başarılı");
     }
 
