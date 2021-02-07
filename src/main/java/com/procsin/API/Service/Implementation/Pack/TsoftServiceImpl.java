@@ -240,16 +240,16 @@ public class TsoftServiceImpl implements TsoftService {
             data += "]";
             switch (newStatus) {
                 case URUN_HAZIRLANIYOR:
-                    repo.updateOrderStatusToPreparing(token,data);
+                    repo.updateOrderStatusToPreparing(token,data).execute();
                     break;
                 case TEDARIK_SURECINDE:
-                    repo.updateOrderStatusToSupplement(token,data);
+                    repo.updateOrderStatusToSupplement(token,data).execute();
                     break;
                 case CIKIS_BEKLENIYOR:
-                    repo.updateOrderStatusToReturnPreparing(token,data);
+                    repo.updateOrderStatusToReturnPreparing(token,data).execute();
                     break;
                 case YENIDEN_CIKIS_TEDARIK:
-                    repo.updateOrderStatusToReturnSupplement(token,data);
+                    repo.updateOrderStatusToReturnSupplement(token,data).execute();
                     break;
                 default:
                     break;
