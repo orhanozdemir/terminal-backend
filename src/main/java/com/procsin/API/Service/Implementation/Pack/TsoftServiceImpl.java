@@ -343,29 +343,28 @@ public class TsoftServiceImpl implements TsoftService {
     private void refundCheck(OrderModel orderModel) {
         int tempTotal = 0;
         for (ProductModel model : new ArrayList<ProductModel>(orderModel.OrderDetails)) {
+            model.Quantity = model.Quantity - model.RefundCount;
             if (model.IsPackage.equals("1")) {
                 for (ProductModel innerModel : model.PackageContent) {
-                    innerModel.Quantity = innerModel.Quantity - innerModel.RefundCount;
                     if (innerModel.count == null) {
-                        innerModel.count = model.Quantity;
+                        innerModel.count = innerModel.PackageQuantity;
                         innerModel.setTotalCount(innerModel.count);
                         tempTotal += innerModel.count;
                     }
-                    if (innerModel.Quantity == 0) {
-                        orderModel.OrderDetails.remove(model);
-                    }
+//                    if (innerModel.PackageQuantity == 0) {
+//                        orderModel.OrderDetails.remove(innerModel);
+//                    }
                 }
             }
             else {
-                model.Quantity = model.Quantity - model.RefundCount;
                 if (model.count == null) {
                     model.count = model.Quantity;
                     model.setTotalCount(model.count);
                     tempTotal += model.count;
                 }
-                if (model.Quantity == 0) {
-                    orderModel.OrderDetails.remove(model);
-                }
+            }
+            if (model.Quantity == 0) {
+                orderModel.OrderDetails.remove(model);
             }
         }
         orderModel.totalProductCount = tempTotal;
