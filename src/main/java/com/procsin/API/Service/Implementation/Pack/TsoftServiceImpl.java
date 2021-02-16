@@ -4,6 +4,7 @@ import com.procsin.API.DAO.CampaignLogDao;
 import com.procsin.API.DAO.ErrorLogDao;
 import com.procsin.API.DAO.Pack.CampaignDao;
 import com.procsin.API.DAO.Pack.OrderDao;
+import com.procsin.API.DAO.Pack.Return.CreatedOrderDAO;
 import com.procsin.API.DAO.UserDao;
 import com.procsin.API.Model.GenericResponse;
 import com.procsin.API.Model.OrderLogSuccessModel;
@@ -15,6 +16,7 @@ import com.procsin.DB.Entity.Pack.Campaign;
 import com.procsin.DB.Entity.Pack.CampaignLog;
 import com.procsin.DB.Entity.Pack.OrderLog;
 import com.procsin.DB.Entity.Pack.Orders;
+import com.procsin.DB.Entity.Pack.Return.CreatedOrder;
 import com.procsin.DB.Entity.UserManagement.User;
 import com.procsin.Retrofit.Interfaces.TsoftInterface;
 import com.procsin.Retrofit.Models.TSoft.OrderDataModel;
@@ -76,6 +78,9 @@ public class TsoftServiceImpl implements TsoftService {
     UserDao userRepository;
     @Autowired
     EntityManager em;
+
+    @Autowired
+    CreatedOrderDAO createdOrderDAO;
 
     private User getActiveUser() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -256,7 +261,6 @@ public class TsoftServiceImpl implements TsoftService {
         refundCheck(orderModel);
 
         if (order == null) {
-//            orderModel.setTotalProductCount();
             order = new Orders(orderModel);
             orderRepository.save(order);
         }
@@ -272,8 +276,15 @@ public class TsoftServiceImpl implements TsoftService {
             Date date = new Date((orderModel.OrderDateTimeStamp) * 1000);
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             String orderDate = dateFormat.format(date);
+            double cost = order.getTotalCost();
 
-            Campaign campaign = campaignRepository.findSuitableCampaign(order.getTotalCost(), orderDate);
+            if (isReturn) {
+                CreatedOrder temp = createdOrderDAO.findByNewOrderCode(order.getOrderCode());
+                OrderModel tempOrder = getSingleOrder(token, temp.order.orderCode);
+                orderDate = dateFormat.format(new Date((tempOrder.OrderDateTimeStamp) * 1000));
+                cost = tempOrder.OrderTotalPrice;
+            }
+            Campaign campaign = campaignRepository.findSuitableCampaign(cost, orderDate);
 
             if (campaign != null) {
                 boolean shouldShow = false;
@@ -285,6 +296,9 @@ public class TsoftServiceImpl implements TsoftService {
                     shouldShow = true;
                 }
                 else if (campaign.isWebAvailable() && (orderModel.Application.equals("") || orderModel.Application.equals("mobile_site"))) {
+                    shouldShow = true;
+                }
+                else if (isReturn) {
                     shouldShow = true;
                 }
 
@@ -315,7 +329,6 @@ public class TsoftServiceImpl implements TsoftService {
                 }
             }
 
-//            GenericTsoftResponseModel response = repo.updateOrderStatusToPack(token,updateOrderDataString(orderModel.OrderCode)).execute().body();
             GenericTsoftResponseModel response = updateOrderStatus(token,isReturn,orderModel.OrderCode,Orders.OrderStatusEnum.PACKING);
             if (response != null && response.success) {
                 orderModel.DeliveryName = orderModel.DeliveryName + " - " + orderModel.Cargo;
@@ -330,29 +343,28 @@ public class TsoftServiceImpl implements TsoftService {
     private void refundCheck(OrderModel orderModel) {
         int tempTotal = 0;
         for (ProductModel model : new ArrayList<ProductModel>(orderModel.OrderDetails)) {
+            model.Quantity = model.Quantity - model.RefundCount;
             if (model.IsPackage.equals("1")) {
                 for (ProductModel innerModel : model.PackageContent) {
-                    innerModel.Quantity = innerModel.Quantity - innerModel.RefundCount;
                     if (innerModel.count == null) {
-                        innerModel.count = model.Quantity;
+                        innerModel.count = innerModel.PackageQuantity;
                         innerModel.setTotalCount(innerModel.count);
                         tempTotal += innerModel.count;
                     }
-                    if (innerModel.Quantity == 0) {
-                        orderModel.OrderDetails.remove(model);
-                    }
+//                    if (innerModel.PackageQuantity == 0) {
+//                        orderModel.OrderDetails.remove(innerModel);
+//                    }
                 }
             }
             else {
-                model.Quantity = model.Quantity - model.RefundCount;
                 if (model.count == null) {
                     model.count = model.Quantity;
                     model.setTotalCount(model.count);
                     tempTotal += model.count;
                 }
-                if (model.Quantity == 0) {
-                    orderModel.OrderDetails.remove(model);
-                }
+            }
+            if (model.Quantity == 0) {
+                orderModel.OrderDetails.remove(model);
             }
         }
         orderModel.totalProductCount = tempTotal;
