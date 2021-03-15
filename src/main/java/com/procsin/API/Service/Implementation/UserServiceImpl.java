@@ -15,7 +15,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
 @Service(value = "userService")
 public class UserServiceImpl implements UserDetailsService, UserService {
 
@@ -62,6 +61,18 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     @Override
     public User findById(Long id) {
         return userDao.findById(id).get();
+    }
+
+    @Override
+    public User updatePassword(String username, String oldPassword, String newPassword) {
+        User user = findOne(username);
+        if (user != null && oldPassword != null) {
+            if (bcryptEncoder.matches(oldPassword, user.getPassword())) {
+                user.setPassword(bcryptEncoder.encode(newPassword));
+                return userDao.save(user);
+            }
+        }
+        return null;
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.procsin.API.Controller;
 
 import com.procsin.API.Model.AuthToken;
 import com.procsin.API.Model.LoginRequestModel;
+import com.procsin.API.Model.UpdatePasswordRequestModel;
 import com.procsin.API.Service.Interface.UserService;
 import com.procsin.Configuration.TokenProvider;
 import com.procsin.DB.Entity.UserManagement.User;
@@ -56,5 +57,10 @@ public class AuthenticationController {
     @RequestMapping(value="/signup", method = RequestMethod.POST)
     public User saveUser(@RequestBody User user){
         return userService.save(user);
+    }
+
+    @RequestMapping(value = "/updatePassword", method = RequestMethod.POST)
+    public User updatePassword(@RequestBody UpdatePasswordRequestModel model) {
+        return userService.updatePassword(model.username, model.oldPassword, model.newPassword);
     }
 }
