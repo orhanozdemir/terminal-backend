@@ -10,6 +10,9 @@ import com.procsin.API.Service.Interface.Pack.TsoftService;
 import com.procsin.DB.Entity.Pack.Return.ReturnedOrder;
 import com.procsin.DB.Entity.Pack.Return.ReturnedOrderStatus;
 import com.procsin.Retrofit.Models.TSoft.OrderModel;
+import com.procsin.Retrofit.Models.TSoft.ProductModel;
+import com.procsin.Retrofit.Models.TSoft.StatusEnum;
+import com.procsin.Retrofit.Models.UpdateOrderStatusRequestModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import retrofit2.http.Query;
@@ -86,9 +89,28 @@ public class TsoftController {
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    @RequestMapping(value = "/supplementAll", method = RequestMethod.POST)
-    GenericResponse changeAllToSupplement(@RequestBody List<String> productCodes) throws IOException {
-        return tsoftService.changeAllToSupplement(productCodes);
+    @RequestMapping(value = "/allOrdersByStatus", method = RequestMethod.GET)
+    List<OrderModel> getAllOrdersByStatus(@RequestParam StatusEnum status) throws IOException {
+        return tsoftService.getAllOrdersByStatus(status);
+    }
+
+    @RequestMapping(value = "/updateOrderStatuses", method = RequestMethod.POST)
+    GenericResponse updateOrderStatuses(@RequestBody UpdateOrderStatusRequestModel requestModel) throws IOException {
+        List<OrderModel> allOrders = tsoftService.getAllOrdersByStatus(requestModel.fromStatus);
+        List<OrderModel> filteredOrders = tsoftService.filterOrdersByProducts(allOrders, requestModel.withProducts, requestModel.withoutProducts);
+        return tsoftService.updateStatuses(filteredOrders, requestModel.toStatus);
+    }
+
+    @RequestMapping(value = "/getOrderProductQuantities", method = RequestMethod.GET)
+    public void getOrderProductQuantities(@RequestParam String start, @RequestParam String end) throws IOException {
+        List<OrderModel> orders = tsoftService.getAllOrdersBetweenDates(start, end);
+        tsoftService.productQuantitiesInOrders(orders);
+    }
+
+    @RequestMapping(value = "/getBasketCount", method = RequestMethod.GET)
+    public void getBasketCount(@RequestParam String start, @RequestParam String end) throws IOException {
+        List<OrderModel> orders = tsoftService.getAllOrdersBetweenDates(start, end);
+        tsoftService.calculateBasketCount(orders);
     }
 
     @RequestMapping(value = "/getMNGBarcode", method = RequestMethod.GET)

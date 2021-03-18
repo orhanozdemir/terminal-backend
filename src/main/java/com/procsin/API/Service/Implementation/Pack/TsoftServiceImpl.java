@@ -27,6 +27,11 @@ import com.procsin.Retrofit.Models.TSoft.ProductModel;
 import com.procsin.Retrofit.Models.TSoft.StatusEnum;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,6 +39,8 @@ import org.springframework.stereotype.Service;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import javax.persistence.EntityManager;
+import javax.persistence.ValidationMode;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -203,27 +210,167 @@ public class TsoftServiceImpl implements TsoftService {
     }
 
     @Override
-    public GenericResponse changeAllToSupplement(List<String> productCodes) throws IOException {
-        List<OrderModel> allOrders = getAllWaitingOrders();
-        List<String> suppOrderCodes = new ArrayList<>();
-        for (OrderModel order : allOrders) {
-            List<ProductModel> products = order.OrderDetails;
-            for (ProductModel product : products) {
-                if (productCodes.contains(product.ProductCode)) {
-                    suppOrderCodes.add(order.OrderCode);
-                    break;
-                }
+    public List<OrderModel> getAllOrdersBetweenDates(String start, String end) throws IOException {
+        String token = getTsoftToken();
+        List<OrderModel> allOrders = new ArrayList<>();
+        String tsoftSearchQuery = "OrderCode | TS | startswith";
+        int limit = 500;
+        String tsoftSortQuery = "OrderDateTimeStamp ASC";
+
+        long startMillis = new DateTime(start).getMillis()/1000;
+        long endMillis = new DateTime(end).getMillis()/1000;
+
+        OrderDataModel response = repo.getOrdersWithDate(token, true, startMillis, endMillis,
+                limit, 0, tsoftSortQuery, tsoftSearchQuery).execute().body();
+        if (response != null) {
+            allOrders.addAll(response.data);
+            int totalOrderCount = response.summary.totalRecordCount;
+            int totalPage = (totalOrderCount%limit == 0) ? (totalOrderCount / limit) : (totalOrderCount / limit + 1);
+            for (int i = 1; i < totalPage; i++) {
+                OrderDataModel temp = repo.getOrdersWithDate(token, true, startMillis, endMillis,
+                        limit, limit*i, tsoftSortQuery, tsoftSearchQuery).execute().body();
+                if(temp != null)
+                    allOrders.addAll(temp.data);
+            }
+        }
+        return allOrders;
+    }
+
+    @Override
+    public void calculateBasketCount(List<OrderModel> orders) throws IOException {
+        Map<String,Integer> baskets = new HashMap<>();
+        for (OrderModel order : orders) {
+            sortProductArray(order);
+            String orderStr = "";
+            for (ProductModel product : order.OrderDetails) {
+                orderStr += product.ProductName + "-" + product.Quantity + ",";
+            }
+            orderStr = orderStr.substring(0, orderStr.length() - 1);
+
+            if (baskets.containsKey(orderStr)) {
+                int value = baskets.get(orderStr);
+                baskets.put(orderStr, value + 1);
+            } else {
+                baskets.put(orderStr, 1);
             }
         }
 
-        String data = "[";
-        for (String temp : suppOrderCodes) {
-            data += "{\"OrderCode\":\"" + temp + "\"},";
-        }
-        data = data.substring(0, data.length() - 1);
-        data += "]";
+        mapToExcel("sepetler","sepetler",baskets);
+    }
 
-        repo.updateOrderStatusToSupplement(getTsoftToken(),data);
+    @Override
+    public void productQuantitiesInOrders(List<OrderModel> orderModels) throws IOException {
+        Map<String, Integer> quantityMap = new HashMap<>();
+        for (OrderModel orderModel : orderModels) {
+            for (ProductModel product : orderModel.OrderDetails) {
+                if (quantityMap.containsKey(product.ProductCode)) {
+                    int value = quantityMap.get(product.ProductCode);
+                    quantityMap.put(product.ProductCode, (value + product.Quantity));
+                } else {
+                    quantityMap.put(product.ProductCode, product.Quantity);
+                }
+            }
+        }
+        mapToExcel("kampanya-adet","Kampanya - Ürün Adetleri",quantityMap);
+    }
+
+    public void mapToExcel(String fileName, String sheetTitle, Map<String,Integer> map) throws IOException {
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet();
+
+        int rowCount = 0;
+
+        for (String key : map.keySet()) {
+            Row row = sheet.createRow(++rowCount);
+            Cell cell1 = row.createCell(0);
+            cell1.setCellValue(key);
+            Cell cell2 = row.createCell(1);
+            cell2.setCellValue(map.get(key));
+        }
+
+        try (FileOutputStream outputStream = new FileOutputStream( fileName+".xlsx")) {
+            workbook.write(outputStream);
+        }
+    }
+
+    @Override
+    public List<OrderModel> getAllOrdersByStatus(StatusEnum status) throws IOException {
+        String token = getTsoftToken();
+        List<OrderModel> allOrders = new ArrayList<>();
+        String tsoftSearchQuery = "OrderCode | TS | startswith";
+
+        int limit = 500;
+        String tsoftSortQuery = "OrderDateTimeStamp ASC";
+        OrderDataModel response = repo.getOrders(token,status.statusId,true,limit,
+                0, tsoftSortQuery, tsoftSearchQuery).execute().body();
+        if(response != null) {
+            allOrders.addAll(response.data);
+            int totalOrderCount = response.summary.totalRecordCount;
+            int totalPage = (totalOrderCount%limit == 0) ? (totalOrderCount / limit) : (totalOrderCount / limit + 1);
+            for (int i = 1; i < totalPage; i++) {
+                OrderDataModel temp = repo.getOrders(token, status.statusId, true, limit,
+                        limit*i, tsoftSortQuery, tsoftSearchQuery).execute().body();
+                if(temp != null)
+                    allOrders.addAll(temp.data);
+            }
+        }
+        return allOrders;
+    }
+
+    @Override
+    public List<OrderModel> filterOrdersByProducts(List<OrderModel> orders, List<String> withProducts, List<String> withoutProducts) {
+        List<OrderModel> filteredOrders = new ArrayList<>();
+        for (OrderModel order : orders) {
+            boolean wantedFlag = false;
+            boolean unwantedFlag = false;
+            for (ProductModel product : order.OrderDetails) {
+                if (withoutProducts.contains(product.ProductCode)) {
+                    unwantedFlag = true;
+                    break;
+                }
+                if (withProducts.size() == 0 || withProducts.contains(product.ProductCode)) {
+                    wantedFlag = true;
+                }
+            }
+            if (wantedFlag && !unwantedFlag) {
+                filteredOrders.add(order);
+            }
+        }
+        return filteredOrders;
+    }
+
+    @Override
+    public GenericResponse updateStatuses(List<OrderModel> orders, StatusEnum newStatus) throws IOException {
+        int period = 50;
+        int pageCount = (orders.size() % period) == 0 ? (orders.size() / period) : (orders.size() / period + 1);
+        String token = getTsoftToken();
+        for (int i = 0; i < pageCount; i++) {
+            int startIndex = i * period;
+            int endIndex = Math.min((startIndex + period), orders.size());
+            List<OrderModel> tempOrders = orders.subList(startIndex, endIndex);
+            String data = "[";
+            for (OrderModel temp : tempOrders) {
+                data += "{\"OrderCode\":\"" + temp.OrderCode + "\"},";
+            }
+            data = data.substring(0, data.length() - 1);
+            data += "]";
+            switch (newStatus) {
+                case URUN_HAZIRLANIYOR:
+                    repo.updateOrderStatusToPreparing(token,data).execute();
+                    break;
+                case TEDARIK_SURECINDE:
+                    repo.updateOrderStatusToSupplement(token,data).execute();
+                    break;
+                case CIKIS_BEKLENIYOR:
+                    repo.updateOrderStatusToReturnPreparing(token,data).execute();
+                    break;
+                case YENIDEN_CIKIS_TEDARIK:
+                    repo.updateOrderStatusToReturnSupplement(token,data).execute();
+                    break;
+                default:
+                    break;
+            }
+        }
         return new GenericResponse(true, "Başarılı");
     }
 

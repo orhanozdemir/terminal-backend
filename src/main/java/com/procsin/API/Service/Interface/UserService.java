@@ -13,4 +13,6 @@ public interface UserService {
 
     User findById(Long id);
 
+    User updatePassword(String username, String oldPassword, String newPassword);
+
 }
