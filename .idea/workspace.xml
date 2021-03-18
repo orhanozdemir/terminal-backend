@@ -5,41 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3f52f282-717d-480b-a032-7be4c2aacfd3" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/csv-plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/csv-plugin.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/procsin/API/Controller/Pack/TsoftController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/procsin/API/Controller/Pack/TsoftController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/procsin/API/Service/Implementation/Pack/TsoftServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/procsin/API/Service/Implementation/Pack/TsoftServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/procsin/API/Service/Interface/Pack/TsoftService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/procsin/API/Service/Interface/Pack/TsoftService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/procsin/Retrofit/Interfaces/TsoftInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/procsin/Retrofit/Interfaces/TsoftInterface.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/csv-plugin.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/procsin/API/DAO/WirelessPrinterDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/procsin/API/Model/ResponseModel/MNGBarcodeResponseModel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/procsin/API/Service/Implementation/Pack/MNGServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/procsin/API/Service/Interface/Pack/MNGService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/procsin/DB/Entity/WirelessPrinter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/procsin/Retrofit/Interfaces/MNGInterface.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/procsin/Retrofit/Models/MNG/MNGGonderiBarkod.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/procsin/Retrofit/Models/MNG/MNGGonderiBarkodRequestModel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/procsin/Retrofit/Models/MNG/MNGGonderiParca.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/procsin/Retrofit/Models/MNG/MNGReqModel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/procsin/Retrofit/Models/MNG/MNGRequestBodyModel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/procsin/Retrofit/Models/MNG/RequestEnvelope.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/procsin/Retrofit/Models/MNG/RequestModel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/procsin/Retrofit/Models/MNG/Response/MNGGonderiBarkodBilgi.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/procsin/Retrofit/Models/MNG/Response/MNGGonderiBarkodResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/procsin/Retrofit/Models/MNG/Response/MNGGonderiBarkodResult.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/procsin/Retrofit/Models/MNG/Response/MNGGonderiBarkods.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/procsin/Retrofit/Models/MNG/Response/MNGResponseBodyModel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/procsin/Retrofit/Models/MNG/Response/ResponseEnvelope.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/procsin/API/Controller/Pack/TsoftController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/procsin/API/Controller/Pack/TsoftController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/procsin/API/Service/Implementation/Pack/OrderServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/procsin/API/Service/Implementation/Pack/OrderServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/procsin/API/Service/Implementation/Pack/TsoftServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/procsin/API/Service/Implementation/Pack/TsoftServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/procsin/API/Service/Interface/Pack/OrderService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/procsin/API/Service/Interface/Pack/OrderService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/procsin/API/Service/Interface/Pack/TsoftService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/procsin/API/Service/Interface/Pack/TsoftService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/procsin/Retrofit/Interfaces/TsoftInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/procsin/Retrofit/Interfaces/TsoftInterface.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -112,7 +78,14 @@
       <recent name="com.procsin.Static" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.Application">
+  <component name="RunDashboard">
+    <option name="configurationTypes">
+      <set>
+        <option value="SpringBootApplicationConfigurationType" />
+      </set>
+    </option>
+  </component>
+  <component name="RunManager" selected="Spring Boot.Application">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
       <method>
@@ -138,17 +111,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
-      <option name="arquillianRunConfiguration">
-        <value>
-          <option name="containerStateName" value="" />
-        </value>
-      </option>
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit">
       <option name="TEST_OBJECT" value="class" />
       <option name="VM_PARAMETERS" />
@@ -157,16 +119,10 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Application (1)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <configuration name="Application" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
       <module name="terminal-backend" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.procsin.Application" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Application" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-      <module name="terminalbackend" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="com.procsin.Application" />
+      <option name="ALTERNATIVE_JRE_PATH" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -193,7 +149,6 @@
     <list>
       <item itemvalue="Application.Application" />
       <item itemvalue="Spring Boot.Application" />
-      <item itemvalue="Spring Boot.Application (1)" />
     </list>
     <recent_temporary>
       <list>
@@ -462,9 +417,6 @@
           <option name="timeStamp" value="252" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/procsin/API/Service/Implementation/Pack/TsoftServiceImpl.java</url>
-          <line>274</line>
-          <option name="timeStamp" value="259" />
           <url>file://$PROJECT_DIR$/src/main/java/com/procsin/API/Controller/Pack/TsoftController.java</url>
           <line>95</line>
           <option name="timeStamp" value="243" />
