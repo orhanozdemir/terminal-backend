@@ -1,5 +1,6 @@
 package com.procsin.API.Service.Implementation.Pack;
 
+import com.procsin.API.DAO.AttributesDAO;
 import com.procsin.API.DAO.CampaignLogDao;
 import com.procsin.API.DAO.ErrorLogDao;
 import com.procsin.API.DAO.Pack.CampaignDao;
@@ -11,6 +12,7 @@ import com.procsin.API.Model.OrderLogSuccessModel;
 import com.procsin.API.Model.TSOFT.CreateOrderRequestModel;
 import com.procsin.API.Model.TSOFT.GenericTsoftResponseModel;
 import com.procsin.API.Service.Interface.Pack.*;
+import com.procsin.DB.Entity.Attributes;
 import com.procsin.DB.Entity.ErrorLog;
 import com.procsin.DB.Entity.Pack.Campaign;
 import com.procsin.DB.Entity.Pack.CampaignLog;
@@ -78,6 +80,9 @@ public class TsoftServiceImpl implements TsoftService {
     UserDao userRepository;
     @Autowired
     EntityManager em;
+
+    @Autowired
+    AttributesDAO attributesDAO;
 
     @Autowired
     CreatedOrderDAO createdOrderDAO;
@@ -241,6 +246,14 @@ public class TsoftServiceImpl implements TsoftService {
         if (response != null) {
             if (response.data != null && response.data.size() > 0) {
                 for (OrderModel model : response.data) {
+                    for (ProductModel product : model.OrderDetails) {
+                        if (product.ProductCode.equals("FP.09.01.012.001")) {
+                            product.ProductCode = "FP.03.01.012.002";
+                            product.ProductName = "HERBAL SCIENCE Boom Butter Cilt Bakım Yağı 190 ML";
+                            product.Barcode = "8697863681723";
+                        }
+                    }
+
                     sortProductArray(model);
                     OrderLogSuccessModel successModel = prepareTsoftOrder(token,isReturn,model);
                     if (successModel.success) {
@@ -331,13 +344,27 @@ public class TsoftServiceImpl implements TsoftService {
 
             GenericTsoftResponseModel response = updateOrderStatus(token,isReturn,orderModel.OrderCode,Orders.OrderStatusEnum.PACKING);
             if (response != null && response.success) {
-                orderModel.DeliveryName = orderModel.DeliveryName + " - " + orderModel.Cargo;
+                if (isStarexOrder(orderModel.CustomerCode)) {
+                    orderModel.DeliveryName = "STAREX SİPARİŞİDİR! - " + orderModel.DeliveryName;
+                }
+                else {
+                    orderModel.DeliveryName = orderModel.DeliveryName + " - " + orderModel.Cargo;
+                }
                 return new OrderLogSuccessModel(true,"Başarılı",campaign,orderModel);
             }
         } catch (IOException e) {
             return new OrderLogSuccessModel(false,"Hata",null,null);
         }
         return new OrderLogSuccessModel(false,"Hata",null,null);
+    }
+
+    private boolean isStarexOrder(String customerCode) {
+        Attributes attr = attributesDAO.getByKeyString("StarexCustomerCodes");
+        if (customerCode != null && attr != null && attr.value != null) {
+            List<String> customerCodes = Arrays.asList(attr.value.split(","));
+            return customerCodes.contains(customerCode);
+        }
+        return false;
     }
 
     private void refundCheck(OrderModel orderModel) {
