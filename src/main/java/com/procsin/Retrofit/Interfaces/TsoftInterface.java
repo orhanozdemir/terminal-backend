@@ -21,6 +21,12 @@ public interface TsoftInterface {
 
     @FormUrlEncoded
     @POST("order2/getOrders")
+    Call<OrderDataModel> getOrdersWithDate(@Field("token") String token, @Field("FetchPackageContent") Boolean FetchPackageContent,
+                                   @Field("OrderDateTimeStart") long OrderDateTimeStart, @Field("OrderDateTimeEnd") long OrderDateTimeEnd,
+                                   @Field("limit") int limit, @Field("start") int start, @Field("orderby") String orderBy, @Field("f") String f);
+
+    @FormUrlEncoded
+    @POST("order2/getOrders")
     Call<OrderDataModel> getSingleOrder(@Field("token") String token, @Field("FetchPackageContent") Boolean FetchPackageContent,
                                         @Field("OrderCode") String orderCode, @Field("Archive") String archive);
 

@@ -17,8 +17,10 @@ public interface TsoftService {
     GenericTsoftResponseModel updateOrderStatus(String token, boolean isReturn, String orderCode, Orders.OrderStatusEnum status) throws IOException;
     GenericResponse createOrder(String token, String orderCode);
     OrderLogSuccessModel getReturnedOrder(String token) throws IOException;
-
+    List<OrderModel> getAllOrdersBetweenDates(String start, String end) throws IOException;
     List<OrderModel> getAllOrdersByStatus(StatusEnum status) throws IOException;
+    void productQuantitiesInOrders(List<OrderModel> orderModels) throws IOException;
+    void calculateBasketCount(List<OrderModel> orders) throws IOException;
     List<OrderModel> filterOrdersByProducts(List<OrderModel> orders, List<String> withProducts, List<String> withoutProducts);
     GenericResponse updateStatuses(List<OrderModel> orders, StatusEnum newStatus) throws IOException;
 }

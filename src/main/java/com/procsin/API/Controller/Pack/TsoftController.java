@@ -89,4 +89,16 @@ public class TsoftController {
         List<OrderModel> filteredOrders = tsoftService.filterOrdersByProducts(allOrders, requestModel.withProducts, requestModel.withoutProducts);
         return tsoftService.updateStatuses(filteredOrders, requestModel.toStatus);
     }
+
+    @RequestMapping(value = "/getOrderProductQuantities", method = RequestMethod.GET)
+    public void getOrderProductQuantities(@RequestParam String start, @RequestParam String end) throws IOException {
+        List<OrderModel> orders = tsoftService.getAllOrdersBetweenDates(start, end);
+        tsoftService.productQuantitiesInOrders(orders);
+    }
+
+    @RequestMapping(value = "/getBasketCount", method = RequestMethod.GET)
+    public void getBasketCount(@RequestParam String start, @RequestParam String end) throws IOException {
+        List<OrderModel> orders = tsoftService.getAllOrdersBetweenDates(start, end);
+        tsoftService.calculateBasketCount(orders);
+    }
 }

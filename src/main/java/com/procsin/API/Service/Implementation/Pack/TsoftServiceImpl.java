@@ -23,6 +23,11 @@ import com.procsin.Retrofit.Models.TSoft.ProductModel;
 import com.procsin.Retrofit.Models.TSoft.StatusEnum;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,6 +35,8 @@ import org.springframework.stereotype.Service;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import javax.persistence.EntityManager;
+import javax.persistence.ValidationMode;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -179,10 +186,95 @@ public class TsoftServiceImpl implements TsoftService {
     }
 
     @Override
+    public List<OrderModel> getAllOrdersBetweenDates(String start, String end) throws IOException {
+        String token = getTsoftToken();
+        List<OrderModel> allOrders = new ArrayList<>();
+        String tsoftSearchQuery = "OrderCode | TS | startswith";
+        int limit = 500;
+        String tsoftSortQuery = "OrderDateTimeStamp ASC";
+
+        long startMillis = new DateTime(start).getMillis()/1000;
+        long endMillis = new DateTime(end).getMillis()/1000;
+
+        OrderDataModel response = repo.getOrdersWithDate(token, true, startMillis, endMillis,
+                limit, 0, tsoftSortQuery, tsoftSearchQuery).execute().body();
+        if (response != null) {
+            allOrders.addAll(response.data);
+            int totalOrderCount = response.summary.totalRecordCount;
+            int totalPage = (totalOrderCount%limit == 0) ? (totalOrderCount / limit) : (totalOrderCount / limit + 1);
+            for (int i = 1; i < totalPage; i++) {
+                OrderDataModel temp = repo.getOrdersWithDate(token, true, startMillis, endMillis,
+                        limit, limit*i, tsoftSortQuery, tsoftSearchQuery).execute().body();
+                if(temp != null)
+                    allOrders.addAll(temp.data);
+            }
+        }
+        return allOrders;
+    }
+
+    @Override
+    public void calculateBasketCount(List<OrderModel> orders) throws IOException {
+        Map<String,Integer> baskets = new HashMap<>();
+        for (OrderModel order : orders) {
+            sortProductArray(order);
+            String orderStr = "";
+            for (ProductModel product : order.OrderDetails) {
+                orderStr += product.ProductName + "-" + product.Quantity + ",";
+            }
+            orderStr = orderStr.substring(0, orderStr.length() - 1);
+
+            if (baskets.containsKey(orderStr)) {
+                int value = baskets.get(orderStr);
+                baskets.put(orderStr, value + 1);
+            } else {
+                baskets.put(orderStr, 1);
+            }
+        }
+
+        mapToExcel("sepetler","sepetler",baskets);
+    }
+
+    @Override
+    public void productQuantitiesInOrders(List<OrderModel> orderModels) throws IOException {
+        Map<String, Integer> quantityMap = new HashMap<>();
+        for (OrderModel orderModel : orderModels) {
+            for (ProductModel product : orderModel.OrderDetails) {
+                if (quantityMap.containsKey(product.ProductCode)) {
+                    int value = quantityMap.get(product.ProductCode);
+                    quantityMap.put(product.ProductCode, (value + product.Quantity));
+                } else {
+                    quantityMap.put(product.ProductCode, product.Quantity);
+                }
+            }
+        }
+        mapToExcel("kampanya-adet","Kampanya - Ürün Adetleri",quantityMap);
+    }
+
+    public void mapToExcel(String fileName, String sheetTitle, Map<String,Integer> map) throws IOException {
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet();
+
+        int rowCount = 0;
+
+        for (String key : map.keySet()) {
+            Row row = sheet.createRow(++rowCount);
+            Cell cell1 = row.createCell(0);
+            cell1.setCellValue(key);
+            Cell cell2 = row.createCell(1);
+            cell2.setCellValue(map.get(key));
+        }
+
+        try (FileOutputStream outputStream = new FileOutputStream( fileName+".xlsx")) {
+            workbook.write(outputStream);
+        }
+    }
+
+    @Override
     public List<OrderModel> getAllOrdersByStatus(StatusEnum status) throws IOException {
         String token = getTsoftToken();
         List<OrderModel> allOrders = new ArrayList<>();
         String tsoftSearchQuery = "OrderCode | TS | startswith";
+
         int limit = 500;
         String tsoftSortQuery = "OrderDateTimeStamp ASC";
         OrderDataModel response = repo.getOrders(token,status.statusId,true,limit,

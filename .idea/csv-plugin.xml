@@ -10,6 +10,20 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/src/main/java/com/procsin/API/Controller/Pack/TsoftController.java">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/src/main/java/com/procsin/API/Service/Implementation/Pack/TsoftServiceImpl.java">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/src/main/java/com/procsin/API/Service/Implementation/UserServiceImpl.java">
           <value>
             <Attribute>
