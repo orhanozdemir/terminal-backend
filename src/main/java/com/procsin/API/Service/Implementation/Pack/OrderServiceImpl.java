@@ -85,8 +85,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public OrderModel searchOrder(String token, String orderCode) throws IOException {
+        return tsoftService.searchOrder(token,orderCode);
+    }
+
+    @Override
     public GenericResponse finishOrder(String token, boolean isReturn, String orderCode) {
-        boolean isTrendyol = orderCode.startsWith("TY");
         if (isPackedBefore(orderCode)) {
             String errorMessage = "Bu sipariş daha önce tamamlanmış";
             createErrorLog("Order-1007",errorMessage + " / " + orderCode);
@@ -100,16 +104,14 @@ public class OrderServiceImpl implements OrderService {
                 throw new IllegalStateException(errorMessage);
             }
             try {
-                if (!isTrendyol) {
-                    if (token == null) {
-                        token = tsoftService.getTsoftToken();
-                    }
-                    GenericTsoftResponseModel response = tsoftService.updateOrderStatus(token,false,orderCode,Orders.OrderStatusEnum.PACKED);
-                    if (response == null || !response.success) {
-                        String errorMessage = "Sipariş tamamlanırken bir sorun oluştu.";
-                        createErrorLog("Order-1009",errorMessage + " / " + orderCode);
-                        throw new IllegalStateException(errorMessage);
-                    }
+                if (token == null) {
+                    token = tsoftService.getTsoftToken();
+                }
+                GenericTsoftResponseModel response = tsoftService.updateOrderStatus(token,false,orderCode,Orders.OrderStatusEnum.PACKED);
+                if (response == null || !response.success) {
+                    String errorMessage = "Sipariş tamamlanırken bir sorun oluştu.";
+                    createErrorLog("Order-1009",errorMessage + " / " + orderCode);
+                    throw new IllegalStateException(errorMessage);
                 }
                 orderLogService.createOrderLog(order,OrderLog.OrderStatus.KARGO_HAZIR);
                 if (!isReturn) {
@@ -162,7 +164,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public GenericResponse cancelOrder(String token, boolean isReturn, String orderCode) {
-        boolean isTrendyol = orderCode.startsWith("TY");
         Orders order = orderDao.findByOrderCode(orderCode);
         if (order == null) {
             String errorCode = "Order-1005";
@@ -177,19 +178,17 @@ public class OrderServiceImpl implements OrderService {
             throw new IllegalStateException(errorMessage);
         }
         try {
-            if (!isTrendyol) {
-                if (token == null) {
-                    token = tsoftService.getTsoftToken();
-                }
-                OrderModel temp = getSpecificOrder(token, orderCode);
-                if (temp.OrderStatusId.equals(StatusEnum.URUN_PAKETLENIYOR.statusId)) {
-                    GenericTsoftResponseModel response = tsoftService.updateOrderStatus(token,isReturn,orderCode, Orders.OrderStatusEnum.CANCELED);
-                    if (response == null || !response.success) {
-                        String errorCode = "Order-1010";
-                        String errorMessage = errorCode + "/" + "sipariş iptal edilirken sorun oluştu.";
-                        createErrorLog(errorCode,errorMessage + " / " + orderCode);
-                        throw new IllegalStateException(errorMessage);
-                    }
+            if (token == null) {
+                token = tsoftService.getTsoftToken();
+            }
+            OrderModel temp = getSpecificOrder(token, orderCode);
+            if (temp.OrderStatusId.equals(StatusEnum.URUN_PAKETLENIYOR.statusId)) {
+                GenericTsoftResponseModel response = tsoftService.updateOrderStatus(token,isReturn,orderCode, Orders.OrderStatusEnum.CANCELED);
+                if (response == null || !response.success) {
+                    String errorCode = "Order-1010";
+                    String errorMessage = errorCode + "/" + "sipariş iptal edilirken sorun oluştu.";
+                    createErrorLog(errorCode,errorMessage + " / " + orderCode);
+                    throw new IllegalStateException(errorMessage);
                 }
             }
             orderLogService.createOrderLog(order,OrderLog.OrderStatus.URUN_PAKETLENIYOR_IPTAL);

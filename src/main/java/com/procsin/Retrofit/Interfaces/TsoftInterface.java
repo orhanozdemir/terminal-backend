@@ -31,6 +31,10 @@ public interface TsoftInterface {
                                         @Field("OrderCode") String orderCode, @Field("Archive") String archive);
 
     @FormUrlEncoded
+    @POST("order2/getOrders")
+    Call<OrderDataModel> searchOrder(@Field("token") String token, @Field("OrderStatusId") String OrderStatusId, @Field("f") String f);
+
+    @FormUrlEncoded
     @POST("order2/updateOrderStatusAs/1202")
     Call<GenericTsoftResponseModel> updateOrderStatusToPack(@Field("token") String token, @Field("data") String data);
 
