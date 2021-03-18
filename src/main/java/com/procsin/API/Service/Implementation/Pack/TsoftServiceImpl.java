@@ -121,6 +121,20 @@ public class TsoftServiceImpl implements TsoftService {
         throw new IllegalArgumentException();
     }
 
+    @Override
+    public OrderModel searchOrder(String token, String orderCode) throws IOException {
+        if (token == null) {
+            token = getTsoftToken();
+        }
+        String tsoftSearchQuery = "OrderCode | " + orderCode + " | endswith";
+        OrderDataModel dataModel = repo.searchOrder(token, "5", tsoftSearchQuery).execute().body();
+        if (dataModel != null && dataModel.data != null && dataModel.data.size() == 1) {
+            return dataModel.data.get(0);
+        } else {
+            return null;
+        }
+    }
+
     void sortProductArray(OrderModel model) {
         Collections.sort(model.OrderDetails, new Comparator<ProductModel>() {
             @Override
@@ -246,14 +260,6 @@ public class TsoftServiceImpl implements TsoftService {
         if (response != null) {
             if (response.data != null && response.data.size() > 0) {
                 for (OrderModel model : response.data) {
-                    for (ProductModel product : model.OrderDetails) {
-                        if (product.ProductCode.equals("FP.09.01.012.001")) {
-                            product.ProductCode = "FP.03.01.012.002";
-                            product.ProductName = "HERBAL SCIENCE Boom Butter Cilt Bakım Yağı 190 ML";
-                            product.Barcode = "8697863681723";
-                        }
-                    }
-
                     sortProductArray(model);
                     OrderLogSuccessModel successModel = prepareTsoftOrder(token,isReturn,model);
                     if (successModel.success) {

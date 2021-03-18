@@ -85,6 +85,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public OrderModel searchOrder(String token, String orderCode) throws IOException {
+        return tsoftService.searchOrder(token,orderCode);
+    }
+
+    @Override
     public GenericResponse finishOrder(String token, boolean isReturn, String orderCode) {
         if (isPackedBefore(orderCode)) {
             String errorMessage = "Bu sipariş daha önce tamamlanmış";
