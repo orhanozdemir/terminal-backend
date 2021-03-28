@@ -407,6 +407,13 @@ public class TsoftServiceImpl implements TsoftService {
         if (response != null) {
             if (response.data != null && response.data.size() > 0) {
                 for (OrderModel model : response.data) {
+
+                    for (ProductModel product : model.OrderDetails) {
+                        if ("FP.01.05.015.007".equals(product.ProductCode)) {
+                            product.ProductCode = "FP.03.05.015.004";
+                        }
+                    }
+
                     sortProductArray(model);
                     OrderLogSuccessModel successModel = prepareTsoftOrder(token,isReturn,model);
                     if (successModel.success) {
