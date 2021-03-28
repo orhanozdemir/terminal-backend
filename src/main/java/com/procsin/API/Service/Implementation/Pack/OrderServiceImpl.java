@@ -22,6 +22,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -61,7 +64,7 @@ public class OrderServiceImpl implements OrderService {
             if (token == null) {
                 token = tsoftService.getTsoftToken();
             }
-            return tsoftService.getTSoftOrder(token,isTrendyol);
+            return tsoftService.getTSoftOrder(token,StatusEnum.URUN_HAZIRLANIYOR,isTrendyol);
         } catch (IOException e) {
             throw new IllegalArgumentException();
         }
@@ -91,12 +94,16 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public GenericResponse finishOrder(String token, boolean isReturn, String orderCode) {
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
         if (isPackedBefore(orderCode)) {
             String errorMessage = "Bu sipariş daha önce tamamlanmış";
             createErrorLog("Order-1007",errorMessage + " / " + orderCode);
             throw new IllegalStateException(errorMessage);
         }
         else {
+            System.out.println("-----------------------------------------------------");
+            System.out.println(orderCode);
+            System.out.println(dateFormat.format(new Date()));
             Orders order = orderDao.findByOrderCode(orderCode);
             if (order == null) {
                 String errorMessage = "Bu sipariş hiç oluşturulmamış";
@@ -107,20 +114,31 @@ public class OrderServiceImpl implements OrderService {
                 if (token == null) {
                     token = tsoftService.getTsoftToken();
                 }
+                System.out.println(dateFormat.format(new Date()) + " - before update status");
                 GenericTsoftResponseModel response = tsoftService.updateOrderStatus(token,false,orderCode,Orders.OrderStatusEnum.PACKED);
+                System.out.println(dateFormat.format(new Date()) + " - after update status");
                 if (response == null || !response.success) {
                     String errorMessage = "Sipariş tamamlanırken bir sorun oluştu.";
                     createErrorLog("Order-1009",errorMessage + " / " + orderCode);
                     throw new IllegalStateException(errorMessage);
                 }
                 orderLogService.createOrderLog(order,OrderLog.OrderStatus.KARGO_HAZIR);
+                System.out.println(dateFormat.format(new Date()) + " - after order log");
                 if (!isReturn) {
-                    iisService.createInvoice(orderCode);
+                    System.out.println(dateFormat.format(new Date()) + " - before invoice");
+                    try {
+                        iisService.createInvoice(orderCode);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println(dateFormat.format(new Date()) + " - after invoice");
                 }
                 else {
                     ReturnedOrder returnedOrder = returnedOrderService.findReturnedOrder(orderCode);
                     returnedOrderService.updateReturnedOrder(returnedOrder.id, ReturnedOrderStatus.YENIDEN_CIKIS_SAGLANDI,null,null);
                 }
+                System.out.println(dateFormat.format(new Date()) + " - finish");
+                System.out.println("-----------------------------------------------------");
                 return new GenericResponse(true,"Başarılı");
             } catch (IOException e) {
                 e.printStackTrace();

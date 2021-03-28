@@ -3,6 +3,13 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
+        <entry key="/src/main/java/com/procsin/API/Controller/Pack/TsoftController.java">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/src/main/java/com/procsin/API/Service/Implementation/Pack/MNGServiceImpl.java">
           <value>
             <Attribute>
@@ -10,7 +17,21 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="/src/main/java/com/procsin/API/Service/Implementation/Pack/TsoftServiceImpl.java">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="/src/main/java/com/procsin/API/Service/Interface/Pack/MNGService.java">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/src/main/java/com/procsin/API/Service/Interface/Pack/OrderService.java">
           <value>
             <Attribute>
               <option name="separator" value=";" />

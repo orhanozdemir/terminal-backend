@@ -2,6 +2,8 @@ package com.procsin.API.Controller.Pack;
 
 import com.procsin.API.Model.GenericResponse;
 import com.procsin.API.Model.OrderLogSuccessModel;
+import com.procsin.API.Model.RequestModel.GetBasketOrders.GetBasketOrdersRequestModel;
+import com.procsin.API.Model.RequestModel.GetBasketOrders.GetBasketTypesResponseModel;
 import com.procsin.API.Model.ResponseModel.MNGBarcodeResponseModel;
 import com.procsin.API.Service.Interface.Pack.MNGService;
 import com.procsin.API.Service.Interface.Pack.OrderService;
@@ -13,6 +15,7 @@ import com.procsin.Retrofit.Models.TSoft.OrderModel;
 import com.procsin.Retrofit.Models.TSoft.ProductModel;
 import com.procsin.Retrofit.Models.TSoft.StatusEnum;
 import com.procsin.Retrofit.Models.UpdateOrderStatusRequestModel;
+import org.hibernate.criterion.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import retrofit2.http.Query;
@@ -94,6 +97,11 @@ public class TsoftController {
         return tsoftService.getAllOrdersByStatus(status);
     }
 
+    @RequestMapping(value = "/getOneFromStatus", method = RequestMethod.GET)
+    OrderLogSuccessModel limitedOrdersByStatus(@RequestParam StatusEnum status) throws IOException {
+        return tsoftService.getTSoftOrder(null, status, false);
+    }
+
     @RequestMapping(value = "/updateOrderStatuses", method = RequestMethod.POST)
     GenericResponse updateOrderStatuses(@RequestBody UpdateOrderStatusRequestModel requestModel) throws IOException {
         List<OrderModel> allOrders = tsoftService.getAllOrdersByStatus(requestModel.fromStatus);
@@ -107,14 +115,29 @@ public class TsoftController {
         tsoftService.productQuantitiesInOrders(orders);
     }
 
+    @RequestMapping(value = "/getBasketOrders", method = RequestMethod.POST)
+    public void getBasketOrders(@RequestBody GetBasketOrdersRequestModel requestModel) {
+
+    }
+
+    @RequestMapping(value = "/getBasketTypes", method = RequestMethod.GET)
+    public List<GetBasketTypesResponseModel> getBasketTypes(@RequestParam String fromStatus) throws IOException {
+        return tsoftService.getBasketTypes(StatusEnum.valueOf(fromStatus));
+    }
+
     @RequestMapping(value = "/getBasketCount", method = RequestMethod.GET)
     public void getBasketCount(@RequestParam String start, @RequestParam String end) throws IOException {
         List<OrderModel> orders = tsoftService.getAllOrdersBetweenDates(start, end);
-        tsoftService.calculateBasketCount(orders);
+        tsoftService.calculateBasketCount(orders, true);
     }
 
     @RequestMapping(value = "/getMNGBarcode", method = RequestMethod.GET)
-    MNGBarcodeResponseModel trySth(@Query("orderCode") String orderCode) {
+    MNGBarcodeResponseModel getMngBarcode(@Query("orderCode") String orderCode) {
         return mngService.getMNGBarcode(orderCode);
+    }
+
+    @RequestMapping(value = "/updateOrdersWithBasket", method = RequestMethod.GET)
+    void updateOrdersWithBasketStr(@Query("basketStr") String basketStr) throws IOException {
+        tsoftService.updateOrdersWithBasketStr(basketStr);
     }
 }

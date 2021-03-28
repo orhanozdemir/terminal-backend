@@ -1,4 +1,4 @@
-package com.procsin.API.Model;
+package com.procsin.API.Model.RequestModel;
 
 import com.procsin.DB.Entity.Pack.Return.ReturnedProduct;
 import com.procsin.Retrofit.Models.TSoft.OrderModel;

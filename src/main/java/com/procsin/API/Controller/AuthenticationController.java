@@ -2,7 +2,7 @@ package com.procsin.API.Controller;
 
 import com.procsin.API.Model.AuthToken;
 import com.procsin.API.Model.LoginRequestModel;
-import com.procsin.API.Model.UpdatePasswordRequestModel;
+import com.procsin.API.Model.RequestModel.UpdatePasswordRequestModel;
 import com.procsin.API.Service.Interface.UserService;
 import com.procsin.Configuration.TokenProvider;
 import com.procsin.DB.Entity.UserManagement.User;

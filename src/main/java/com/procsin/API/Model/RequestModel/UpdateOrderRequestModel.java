@@ -1,4 +1,4 @@
-package com.procsin.API.Model;
+package com.procsin.API.Model.RequestModel;
 
 import com.procsin.API.Model.TSOFT.OrderResponseModel;
 import com.procsin.DB.Entity.UserManagement.User;

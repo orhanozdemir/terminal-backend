@@ -9,6 +9,9 @@ import com.procsin.API.DAO.Pack.Return.CreatedOrderDAO;
 import com.procsin.API.DAO.UserDao;
 import com.procsin.API.Model.GenericResponse;
 import com.procsin.API.Model.OrderLogSuccessModel;
+import com.procsin.API.Model.RequestModel.GetBasketOrders.GetBasketOrdersProductModel;
+import com.procsin.API.Model.RequestModel.GetBasketOrders.GetBasketOrdersRequestModel;
+import com.procsin.API.Model.RequestModel.GetBasketOrders.GetBasketTypesResponseModel;
 import com.procsin.API.Model.TSOFT.CreateOrderRequestModel;
 import com.procsin.API.Model.TSOFT.GenericTsoftResponseModel;
 import com.procsin.API.Service.Interface.Pack.*;
@@ -105,8 +108,10 @@ public class TsoftServiceImpl implements TsoftService {
     }
 
     @Override
-    public OrderLogSuccessModel getTSoftOrder(String token, boolean isTrendyol) throws IOException {
-        OrderDataModel response = getOrderByStatus(token, StatusEnum.URUN_HAZIRLANIYOR, isTrendyol);
+    public OrderLogSuccessModel getTSoftOrder(String token, StatusEnum status, boolean isTrendyol) throws IOException {
+        if (token == null)
+            token = getTsoftToken();
+        OrderDataModel response = getOrderByStatus(token, status, isTrendyol);
         return handleOrderResponse(token,false,response);
     }
 
@@ -237,13 +242,13 @@ public class TsoftServiceImpl implements TsoftService {
     }
 
     @Override
-    public void calculateBasketCount(List<OrderModel> orders) throws IOException {
+    public Map<String,Integer> calculateBasketCount(List<OrderModel> orders, boolean shouldCreateExcel) throws IOException {
         Map<String,Integer> baskets = new HashMap<>();
         for (OrderModel order : orders) {
             sortProductArray(order);
             String orderStr = "";
             for (ProductModel product : order.OrderDetails) {
-                orderStr += product.ProductName + "-" + product.Quantity + ",";
+                orderStr += product.ProductCode + "-" + product.Quantity + ",";
             }
             orderStr = orderStr.substring(0, orderStr.length() - 1);
 
@@ -255,7 +260,10 @@ public class TsoftServiceImpl implements TsoftService {
             }
         }
 
-        mapToExcel("sepetler","sepetler",baskets);
+        if (shouldCreateExcel)
+            mapToExcel("sepetler","sepetler",baskets);
+
+        return baskets;
     }
 
     @Override
@@ -318,6 +326,92 @@ public class TsoftServiceImpl implements TsoftService {
     }
 
     @Override
+    public List<OrderModel> getBasketOrders(GetBasketOrdersRequestModel requestModel) throws IOException {
+        String searchText = "";
+        List<OrderModel> orders = new ArrayList<>();
+        requestModel.products.sort(new Comparator<GetBasketOrdersProductModel>() {
+            @Override
+            public int compare(GetBasketOrdersProductModel o1, GetBasketOrdersProductModel o2) {
+                return o1.productCode.compareTo(o2.productCode);
+            }
+        });
+        for (GetBasketOrdersProductModel temp : requestModel.products) {
+            searchText += temp.productCode + "-" + temp.quantity;
+        }
+        searchText = searchText.substring(0, searchText.length() - 1);
+        List<OrderModel> allOrders = getAllOrdersByStatus(requestModel.fromStatus);
+        for (OrderModel temp : allOrders) {
+            String orderBasketStr = generateOrderBasketStr(temp);
+            if (orderBasketStr.equals(searchText)) {
+                orders.add(temp);
+            }
+        }
+        return orders;
+    }
+
+    @Override
+    public void updateOrdersWithBasketStr(String basketStr) throws IOException {
+        List<OrderModel> allOrders = getAllOrdersByStatus(StatusEnum.BEKLEMEDE);
+        List<OrderModel> filteredOrders = new ArrayList<>();
+        for (OrderModel order : allOrders) {
+            sortProductArray(order);
+            String orderStr = generateOrderBasketStr(order);
+            if (basketStr.equals(orderStr)) {
+                filteredOrders.add(order);
+            }
+        }
+        updateStatuses(filteredOrders, StatusEnum.KARGOYA_VERILECEK);
+    }
+
+    @Override
+    public List<GetBasketTypesResponseModel> getBasketTypes(StatusEnum statusEnum) throws IOException {
+        List<GetBasketTypesResponseModel> types = new ArrayList<>();
+        List<OrderModel> allOrders = getAllOrdersByStatus(statusEnum);
+        Map<String, Integer> map = calculateBasketCount(allOrders, false);
+        for (String key : map.keySet()) {
+            GetBasketTypesResponseModel responseModel = generateBasketType(key, map.get(key));
+            types.add(responseModel);
+        }
+
+        Collections.sort(types, new Comparator<GetBasketTypesResponseModel>() {
+            @Override
+            public int compare(GetBasketTypesResponseModel o1, GetBasketTypesResponseModel o2) {
+                return o2.quantity - o1.quantity;
+            }
+        });
+
+        return types;
+    }
+
+    GetBasketTypesResponseModel generateBasketType(String orderStr, int basketQuantity) {
+        GetBasketTypesResponseModel responseModel = new GetBasketTypesResponseModel();
+        responseModel.products = new ArrayList<>();
+        if (orderStr != null) {
+            responseModel.basketStr = orderStr;
+            responseModel.quantity = basketQuantity;
+            String[] strArray = orderStr.split(",");
+            for (String temp : strArray) {
+                String productCode = temp.split("-")[0];
+                int quantity = Integer.parseInt(temp.split("-")[1]);
+                GetBasketOrdersProductModel productModel = new GetBasketOrdersProductModel();
+                productModel.productCode = productCode;
+                productModel.quantity = quantity;
+                responseModel.products.add(productModel);
+            }
+        }
+        return responseModel;
+    }
+
+    String generateOrderBasketStr(OrderModel orderModel) {
+        String basketStr = "";
+        sortProductArray(orderModel);
+        for (ProductModel temp : orderModel.OrderDetails) {
+            basketStr += temp.ProductCode + "-" + temp.Quantity + ",";
+        }
+        return basketStr.substring(0, basketStr.length() - 1);
+    }
+
+    @Override
     public List<OrderModel> filterOrdersByProducts(List<OrderModel> orders, List<String> withProducts, List<String> withoutProducts) {
         List<OrderModel> filteredOrders = new ArrayList<>();
         for (OrderModel order : orders) {
@@ -367,6 +461,12 @@ public class TsoftServiceImpl implements TsoftService {
                 case YENIDEN_CIKIS_TEDARIK:
                     repo.updateOrderStatusToReturnSupplement(token,data).execute();
                     break;
+                case KARGOYA_VERILECEK:
+                    repo.updateOrderStatusToKargoyaVerilecek(token, data).execute();
+                    break;
+                case BEKLEMEDE:
+                    repo.updateOrderStatusToBeklemede(token, data).execute();
+                    break;
                 default:
                     break;
             }
@@ -398,7 +498,7 @@ public class TsoftServiceImpl implements TsoftService {
     }
   
     private OrderDataModel getOrderByStatus(String token, StatusEnum status, boolean isTrendyol) throws IOException {
-        String searchQuery = "OrderCode | " + (isTrendyol ? "TY" : "TS") + " | startswith";
+        String searchQuery = "OrderCode | TS | startswith";
         String sortQuery = "OrderDateTimeStamp ASC";
         return repo.getOrders(token,status.statusId,true,1,0, sortQuery, searchQuery).execute().body();
     }

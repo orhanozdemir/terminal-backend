@@ -6,6 +6,7 @@ public enum StatusEnum {
     URUN_PAKETLENIYOR("1202"),
     TEDARIK_SURECINDE("1203"),
     BEKLEMEDE("1209"),
+    KARGOYA_VERILECEK("1217"),
     KARGO_HAZIR("5"),
     KARGOYA_VERILDI("6"),
     TESLIM_EDILDI("8"),

@@ -1,4 +1,4 @@
-package com.procsin.API.Model;
+package com.procsin.API.Model.RequestModel;
 
 public class UpdatePasswordRequestModel {
     public String username;

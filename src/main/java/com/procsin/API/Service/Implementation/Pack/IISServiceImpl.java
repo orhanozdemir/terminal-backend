@@ -42,24 +42,27 @@ public class IISServiceImpl implements IISService {
 
         boolean isTrendyol = orderCode.contains("TY");
         InvoiceRequestModel requestModel = createRequestModel(orderDetails, isTrendyol);
-        try {
-            Response<AuthResponseModel> authResponse = repo.auth().execute();
-            repo.invoice("(S(" + authResponse.body().SessionID + "))",requestModel).enqueue(new Callback<InvoiceResponseModel>() {
-                @Override
-                public void onResponse(Call<InvoiceResponseModel> call, Response<InvoiceResponseModel> response) {
+        repo.auth().enqueue(new Callback<AuthResponseModel>() {
+            @Override
+            public void onResponse(Call<AuthResponseModel> call, Response<AuthResponseModel> response) {
+                repo.invoice("(S(" + response.body().SessionID + "))",requestModel).enqueue(new Callback<InvoiceResponseModel>() {
+                    @Override
+                    public void onResponse(Call<InvoiceResponseModel> call, Response<InvoiceResponseModel> response) {
 
-                }
+                    }
 
-                @Override
-                public void onFailure(Call<InvoiceResponseModel> call, Throwable throwable) {
+                    @Override
+                    public void onFailure(Call<InvoiceResponseModel> call, Throwable throwable) {
 
-                }
-            });
-//            return invoiceResponse.body();
-        } catch (IOException e) {
-//            e.printStackTrace();
-//            return null;
-        }
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(Call<AuthResponseModel> call, Throwable throwable) {
+
+            }
+        });
     }
 
     @Transactional

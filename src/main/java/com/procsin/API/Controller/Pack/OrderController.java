@@ -1,7 +1,7 @@
 package com.procsin.API.Controller.Pack;
 
 import com.procsin.API.Model.GenericResponse;
-import com.procsin.API.Model.ReturnOrderRequestModel;
+import com.procsin.API.Model.RequestModel.ReturnOrderRequestModel;
 import com.procsin.API.Service.Interface.Pack.ReturnedOrderService;
 import com.procsin.DB.Entity.Pack.Return.ReturnedOrder;
 import com.procsin.DB.Entity.Pack.Return.ReturnedOrderStatus;
